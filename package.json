@@ -1,0 +1,34 @@
+{
+  "name": "influx-ql",
+  "description": "get influx ql",
+  "version": "0.0.1",
+  "author": {
+    "name": "vicanso 小墨鱼",
+    "email": "vicansocanbico@gmail.com"
+  },
+  "keywords": [
+    "influxdb",
+    "ql"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vicanso/influx-ql.git"
+  },
+  "scripts": {
+    "test": "node ./node_modules/.bin/eslint lib/*.js && NODE_ENV=test node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha ./test/*.js --"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "main": "lib/ql",
+  "readmeFilename": "README.md",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "eslint": "^2.5.3",
+    "eslint-config-airbnb": "^6.2.0",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.5"
+  }
+}
