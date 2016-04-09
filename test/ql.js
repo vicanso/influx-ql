@@ -14,7 +14,8 @@ describe('influxdb-ql', () => {
       'fill',
       'into',
       'order',
-      'offset'
+      'offset',
+      'rp'
     ];
     attrList.forEach(attr => {
       const v = 1;
@@ -31,6 +32,16 @@ describe('influxdb-ql', () => {
     const ql = new QL();
     ql.series = 'http';
     assert.equal(ql.toSelect(), 'select * from http');
+  });
+
+  it('set db', () => {
+    const ql = new QL('mydb');
+    ql.series = 'http';
+
+    assert.equal(ql.toSelect(), 'select * from mydb."default".http');
+
+    ql.rp = 'rp';
+    assert.equal(ql.toSelect(), 'select * from mydb.rp.http');
   });
 
   it('select field', () => {
