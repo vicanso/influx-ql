@@ -1,5 +1,7 @@
 # Influx-ql
 
+[![Build Status](https://travis-ci.org/vicanso/influx-ql.svg?branch=master)](https://travis-ci.org/vicanso/influx-ql)
+
 Get influx ql
 
 ```js
