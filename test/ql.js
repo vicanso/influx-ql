@@ -40,7 +40,7 @@ describe('influxdb-ql', () => {
 
     assert.equal(ql.toSelect(), 'select * from mydb."default".http');
 
-    ql.rp = 'rp';
+    ql.RP = 'rp';
     assert.equal(ql.toSelect(), 'select * from mydb.rp.http');
   });
 
