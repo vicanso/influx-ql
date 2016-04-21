@@ -5,7 +5,7 @@ Get influx ql
 ```js
 const QL = require('influx-ql');
 const ql = new QL('mydb');
-ql.series = 'http';
+ql.measurement = 'http';
 ql.addField('status', 'spdy', 'fetch time');
 ql.start = '2016-01-01';
 ql.end = '-3h';
@@ -49,16 +49,16 @@ ql.RP = 'rp-test';
 console.info(ql.RP);
 ```
 
-### series
+### measurement
 
-set/get series
+set/get measurement
 
 ```js
 const QL = require('influx-ql');
 const ql = new QL();
-ql.series = 'http';
+ql.measurement = 'http';
 // http
-console.info(ql.series);
+console.info(ql.measurement);
 ```
 
 ### start
@@ -272,7 +272,7 @@ get select query string
 ```js
 const QL = require('influx-ql');
 const ql = new QL('mydb');
-ql.series = 'http';
+ql.measurement = 'http';
 ql.addField('status', 'spdy', 'fetch time');
 ql.start = '2016-01-01';
 ql.end = '-3h';

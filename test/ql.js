@@ -30,13 +30,13 @@ describe('influxdb-ql', () => {
 
   it('select *', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
     assert.equal(ql.toSelect(), 'select * from http');
   });
 
   it('set db', () => {
     const ql = new QL('mydb');
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     assert.equal(ql.toSelect(), 'select * from mydb."default".http');
 
@@ -46,7 +46,7 @@ describe('influxdb-ql', () => {
 
   it('select field', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
     ql.addField('status');
     assert.equal(ql.toSelect(), 'select status from http');
 
@@ -59,7 +59,7 @@ describe('influxdb-ql', () => {
 
   it('select multi fields', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
     ql.addField('status', 'code');
     assert.equal(ql.toSelect(), 'select code,status from http');
 
@@ -69,7 +69,7 @@ describe('influxdb-ql', () => {
 
   it('set start and end time', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.start = '2016-03-01 23:32:01.232';
     ql.end = '2016-03-02';
@@ -86,7 +86,7 @@ describe('influxdb-ql', () => {
 
   it('set limit', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.limit = 10;
 
@@ -95,7 +95,7 @@ describe('influxdb-ql', () => {
 
   it('set slimit', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.addGroup('*');
     ql.slimit = 10;
@@ -108,7 +108,7 @@ describe('influxdb-ql', () => {
 
   it('add conditions', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.addCondition('code = 500', 'spdy = 1');
     assert.equal(ql.toSelect(), 'select * from http where code = 500 and spdy = 1');
@@ -128,7 +128,7 @@ describe('influxdb-ql', () => {
 
   it('calculate', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.addCalculate('mean', 'use');
     assert.equal(ql.toSelect(), 'select mean(use) from http');
@@ -146,7 +146,7 @@ describe('influxdb-ql', () => {
 
   it('group', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.addGroup('spdy');
     ql.addCalculate('mean', 'use');
@@ -162,7 +162,7 @@ describe('influxdb-ql', () => {
 
   it('fill', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.addCalculate('mean', 'use');
     ql.addGroup('spdy');
@@ -172,7 +172,7 @@ describe('influxdb-ql', () => {
 
   it('into', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.into = 'http copy';
     assert.equal(ql.toSelect(), 'select * into "http copy" from http');
@@ -189,7 +189,7 @@ describe('influxdb-ql', () => {
 
   it('order', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.order = 'desc';
     assert.equal(ql.toSelect(), 'select * from http order by time desc');
@@ -197,53 +197,9 @@ describe('influxdb-ql', () => {
 
   it('offset', () => {
     const ql = new QL();
-    ql.series = 'http';
+    ql.measurement = 'http';
 
     ql.offset = 10;
     assert.equal(ql.toSelect(), 'select * from http offset 10');
   });
-
-  // it('group by', () => {
-  //   const ql = new QL();
-  //   ql.series = 'http';
-
-  //   ql.calculate('mean', 'use');
-  //   assert.equal(ql.toSelect(), 'select mean(use) from http');
-  // });
-
-  // it('delete ql', () => {
-
-  // });
-
-
-
-// select value from response_times
-// where time > '2013-08-12 23:32:01.232' and time < '2013-08-13';
-
-  // it('create database', () => {
-  //   assert.equal(QL.createDatabase(db), 'create database timtam');
-  // });
-
-  // it('create database not exists', () => {
-  //   assert.equal(QL.createDatabaseNotExists(db), 'create database if not exists timtam');
-  // });
-
-  // it('show database', () => {
-  //   assert.equal(QL.showDatabases(), 'SHOW DATABASES');
-  // });
-
-  // it('show retention policies', () => {
-  //   assert.equal(QL.showRetentionPolicies(db), 'SHOW RETENTION POLICIES ON "timtam"');
-  // });
-
-  // it('show tag keys', () => {
-  //   assert.equal(QL.showTagKeys, 'SHOW TAG KEYS');
-  // });
-
 });
-
-
-
-// select * from "series with special characters!"
-
-// select * from "series with \"double quotes\""
