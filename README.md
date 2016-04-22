@@ -1,4 +1,7 @@
-# Influx-ql [![Build Status](https://travis-ci.org/vicanso/influx-ql.svg?branch=master)](https://travis-ci.org/vicanso/influx-ql)
+# Influx-ql 
+
+[![Build Status](https://travis-ci.org/vicanso/influx-ql.svg?branch=master)](https://travis-ci.org/vicanso/influx-ql)
+[![npm](http://img.shields.io/npm/v/influx-ql.svg?style=flat-square)](https://www.npmjs.org/package/influx-ql)
 
 Get influx ql
 
