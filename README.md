@@ -206,6 +206,36 @@ const ql = new QL();
 ql.condition('code', 500);
 ```
 
+### tag
+
+- `key` query tag name
+
+- `value` query tag value
+
+```js
+const QL = require('influx-ql');
+const ql = new QL();
+ql.tag('spdy', 'slow');
+ql.tag({
+  type: '0'
+});
+```
+
+### field
+
+- `key` query field name
+
+- `value` query field value
+
+```js
+const QL = require('influx-ql');
+const ql = new QL();
+ql.field('use', 3000);
+ql.field({
+  code: 400
+});
+```
+
 ### addCalculate
 
 - `type` calculate type
