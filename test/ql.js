@@ -37,10 +37,11 @@ describe('influxdb-ql', () => {
   it('set db', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-
+    assert.equal(ql.measurement, 'http');
     assert.equal(ql.toSelect(), 'select * from mydb."default".http');
 
     ql.RP = 'rp';
+    assert.equal(ql.RP, 'rp');
     assert.equal(ql.toSelect(), 'select * from mydb.rp.http');
   });
 
@@ -201,5 +202,40 @@ describe('influxdb-ql', () => {
 
     ql.offset = 10;
     assert.equal(ql.toSelect(), 'select * from http offset 10');
+  });
+
+  it('createDatabaseNotExists', () => {
+    assert.equal(QL.createDatabaseNotExists('mydb'), 'create database if not exists mydb');
+  });
+
+  it('dropDatabase', () => {
+    assert.equal(QL.dropDatabase('mydb'), 'drop database mydb');
+  });
+
+  it('showDatabases', () => {
+    assert.equal(QL.showDatabases(), 'show databases');
+  });
+
+  it('showRetentionPolicies', () => {
+    assert.equal(QL.showRetentionPolicies('mydb'), 'show retention policies on "mydb"');
+  });
+
+  it('showMeasurements', () => {
+    assert.equal(QL.showMeasurements(), 'show measurements');
+  });
+
+  it('showTagKeys', () => {
+    assert.equal(QL.showTagKeys(), 'show tag keys');
+    assert.equal(QL.showTagKeys('http'), 'show tag keys from "http"');
+  });
+
+  it('showFieldKeys', () => {
+    assert.equal(QL.showFieldKeys(), 'show field keys');
+    assert.equal(QL.showFieldKeys('http'), 'show field keys from "http"');
+  });
+
+  it('showSeries', () => {
+    assert.equal(QL.showSeries(), 'show series');
+    assert.equal(QL.showSeries('http'), 'show series from "http"');
   });
 });
