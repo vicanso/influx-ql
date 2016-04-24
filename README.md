@@ -1,7 +1,9 @@
 # Influx-ql 
 
-[![Build Status](https://travis-ci.org/vicanso/influx-ql.svg?branch=master)](https://travis-ci.org/vicanso/influx-ql)
+[![Build Status](https://travis-ci.org/vicanso/influx-ql.svg?style=flat-square)](https://travis-ci.org/vicanso/influx-ql)
 [![npm](http://img.shields.io/npm/v/influx-ql.svg?style=flat-square)](https://www.npmjs.org/package/influx-ql)
+[![Github Releases](https://img.shields.io/npm/dm/influx-ql.svg?style=flat-square)](https://github.com/node-influx/node-influx)
+
 
 Get influx ql
 
@@ -204,6 +206,10 @@ add custom query condition, the same as `addCondition(key + '=' + value)`
 const QL = require('influx-ql');
 const ql = new QL();
 ql.condition('code', 500);
+ql.condition({
+  spdy: 'fast',
+  type: '1',
+});
 ```
 
 ### tag
@@ -212,12 +218,14 @@ ql.condition('code', 500);
 
 - `value` query tag value
 
+add tag query condition, the same as `condition`
+
 ```js
 const QL = require('influx-ql');
 const ql = new QL();
 ql.tag('spdy', 'slow');
 ql.tag({
-  type: '0'
+  type: '0',
 });
 ```
 
@@ -227,12 +235,14 @@ ql.tag({
 
 - `value` query field value
 
+add field query condition, the same as `condition`
+
 ```js
 const QL = require('influx-ql');
 const ql = new QL();
 ql.field('use', 3000);
 ql.field({
-  code: 400
+  code: 400,
 });
 ```
 
@@ -317,6 +327,101 @@ ql.addGroup('time(6h)');
 ql.fill = 0;
 // select "fetch time",spdy,status from mydb."default".http where code = 400 and time <= now() - 3h and time >= '2016-01-01' and use <= 30 group by time(6h) fill(0) limit 10 slimit 5
 ql.toSelect();
+```
+
+### listSeries
+
+list all series
+
+```js
+QL.listSeries(); // select * from /.*/ limit 1
+```
+
+### createDatabase
+
+- `db` database
+
+create database, if exists, an error will be thrown. 
+
+```js
+QL.createDatabase('mydb'); // create database mydb
+```
+
+### createDatabaseNotExists
+
+- `db` database
+
+create database if not exists
+
+```js
+QL.createDatabaseNotExists('mydb'); // create database if not exists mydb
+```
+
+### dropDatabase
+
+- `db` database
+
+drop database
+
+```js
+QL.dropDatabase('mydb'); // drop database mydb
+```
+
+### showDatabases
+
+show databases
+
+```js
+QL.showDatabases(); // show databases
+```
+
+### showRetentionPolicies
+
+- `db` database
+
+show retention policies
+
+```js
+QL.showRetentionPolicies('mydb'); // show retention policies on mydb
+```
+
+### showMeasurements
+
+show measurements
+
+```js
+QL.showMeasurements(); // show measurements
+```
+
+### showTagKeys
+
+- `measurement` measurement [optional]
+
+show tag keys
+
+```js
+QL.showTagKeys(); // show tag keys
+QL.showTagKeys('http'); // show tag keys from "http"
+```
+
+### showFieldKeys
+
+- `measurement` measurement [optional]
+
+show field keys
+
+```js
+QL.showFieldKeys(); // show field keys
+QL.showFieldKeys('http'); // show field keys from "http"
+```
+
+### showSeries
+
+- `measurement` measurement [optional]
+
+```js
+QL.showSeries(); // show series
+QL.showSeries('http'); // show series from "http"
 ```
 
 ## License

@@ -228,6 +228,10 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from http offset 10');
   });
 
+  it('createDatabase', () => {
+    assert.equal(QL.createDatabase('mydb'), 'create database mydb');
+  });
+
   it('createDatabaseNotExists', () => {
     assert.equal(QL.createDatabaseNotExists('mydb'), 'create database if not exists mydb');
   });
