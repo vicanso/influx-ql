@@ -4,6 +4,8 @@
 [![npm](http://img.shields.io/npm/v/influx-ql.svg?style=flat-square)](https://www.npmjs.org/package/influx-ql)
 [![Github Releases](https://img.shields.io/npm/dm/influx-ql.svg?style=flat-square)](https://github.com/vicanso/influx-ql)
 
+[Influxdb-nodejs](https://github.com/vicanso/influxdb-nodejs) An Influxdb Node.js Client depends on Influx-ql.
+
 
 Get influx ql
 
@@ -18,9 +20,8 @@ ql.limit = 10;
 ql.slimit = 5;
 ql.condition('code', 400);
 ql.addCondition('use <= 30');
-ql.addGroup('time(6h)');
 ql.fill = 0;
-// select "fetch time",spdy,status from mydb."default".http where code = 400 and time <= now() - 3h and time >= '2016-01-01' and use <= 30 group by time(6h) fill(0) limit 10 slimit 5
+// select "fetch time",spdy,status from mydb."default".http where code = 400 and time <= now() - 3h and time >= '2016-01-01' and use <= 30 fill(0) limit 10 slimit 5
 ql.toSelect();
 ```
 
@@ -288,7 +289,7 @@ ql.removeAllCalculate();
 
 ### addGroup
 
-add group by field
+add group by field and it must be used with `addCalculate`
 
 ```js
 const QL = require('influx-ql');
