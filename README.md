@@ -29,6 +29,7 @@ ql.toSelect();
 
 ```bash
 $ npm i influx-ql
+```
 
 ## API
 
