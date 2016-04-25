@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/vicanso/influx-ql.svg?style=flat-square)](https://travis-ci.org/vicanso/influx-ql)
 [![npm](http://img.shields.io/npm/v/influx-ql.svg?style=flat-square)](https://www.npmjs.org/package/influx-ql)
-[![Github Releases](https://img.shields.io/npm/dm/influx-ql.svg?style=flat-square)](https://github.com/node-influx/node-influx)
+[![Github Releases](https://img.shields.io/npm/dm/influx-ql.svg?style=flat-square)](https://github.com/vicanso/influx-ql)
 
 
 Get influx ql
