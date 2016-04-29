@@ -31,6 +31,10 @@ ql.toSelect();
 $ npm i influx-ql
 ```
 
+## Examples
+  
+View the [./examples](examples) directory for working examples. 
+
 ## API
 
 ### constructor
@@ -325,18 +329,9 @@ ql.limit = 10;
 ql.slimit = 5;
 ql.condition('code', 400);
 ql.addCondition('use <= 30');
-ql.addGroup('time(6h)');
 ql.fill = 0;
-// select "fetch time",spdy,status from mydb."default".http where code = 400 and time <= now() - 3h and time >= '2016-01-01' and use <= 30 group by time(6h) fill(0) limit 10 slimit 5
+// select "fetch time",spdy,status from mydb."default".http where code = 400 and time <= now() - 3h and time >= '2016-01-01' and use <= 30 fill(0) limit 10 slimit 5
 ql.toSelect();
-```
-
-### listSeries
-
-list all series
-
-```js
-QL.listSeries(); // select * from /.*/ limit 1
 ```
 
 ### createDatabase

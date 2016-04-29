@@ -24,9 +24,6 @@ describe('influxdb-ql', () => {
     });
   });
 
-  it('list series', () => {
-    assert.equal(QL.listSeries(), 'select * from /.*/ limit 1');
-  });
 
   it('select *', () => {
     const ql = new QL();
@@ -229,15 +226,15 @@ describe('influxdb-ql', () => {
   });
 
   it('createDatabase', () => {
-    assert.equal(QL.createDatabase('mydb'), 'create database mydb');
+    assert.equal(QL.createDatabase('mydb'), 'create database "mydb"');
   });
 
   it('createDatabaseNotExists', () => {
-    assert.equal(QL.createDatabaseNotExists('mydb'), 'create database if not exists mydb');
+    assert.equal(QL.createDatabaseNotExists('mydb'), 'create database if not exists "mydb"');
   });
 
   it('dropDatabase', () => {
-    assert.equal(QL.dropDatabase('mydb'), 'drop database mydb');
+    assert.equal(QL.dropDatabase('mydb'), 'drop database "mydb"');
   });
 
   it('showDatabases', () => {
