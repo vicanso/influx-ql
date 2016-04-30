@@ -1,6 +1,7 @@
 # Influx-ql 
 
 [![Build Status](https://travis-ci.org/vicanso/influx-ql.svg?style=flat-square)](https://travis-ci.org/vicanso/influx-ql)
+[![Coverage Status](https://img.shields.io/coveralls/vicanso/influx-ql/master.svg?style=flat)](https://coveralls.io/r/vicanso/influx-ql?branch=master)
 [![npm](http://img.shields.io/npm/v/influx-ql.svg?style=flat-square)](https://www.npmjs.org/package/influx-ql)
 [![Github Releases](https://img.shields.io/npm/dm/influx-ql.svg?style=flat-square)](https://github.com/vicanso/influx-ql)
 

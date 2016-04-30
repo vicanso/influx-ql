@@ -1,7 +1,7 @@
 {
   "name": "influx-ql",
   "description": "get influx ql",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "author": {
     "name": "vicanso 小墨鱼",
     "email": "vicansocanbico@gmail.com"
@@ -23,9 +23,8 @@
   },
   "main": "lib/ql",
   "readmeFilename": "README.md",
-  "dependencies": {},
   "devDependencies": {
-    "eslint": "^2.8.0",
+    "eslint": "^2.9.0",
     "eslint-config-airbnb": "^7.0.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.4.5"
