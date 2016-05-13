@@ -116,7 +116,7 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from http where code = 404 and spdy = 1');
 
     ql.removeAllCondition();
-    ql.condition('spdy = slow');
+    ql.condition("spdy = 'slow'");
     assert.equal(ql.toSelect(), 'select * from http where spdy = \'slow\'');
 
     ql.removeAllCondition();
