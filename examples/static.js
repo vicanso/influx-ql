@@ -2,9 +2,6 @@
 'use strict';
 const QL = require('..');
 
-// list all series of current database
-QL.listSeries(); // select * from /.*/ limit 1
-
 // create database
 QL.createDatabase('mydb'); // create database "mydb"
 
