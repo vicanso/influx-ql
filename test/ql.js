@@ -124,6 +124,13 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from http where "http spdy" = \'slow\'');
   });
 
+  it('add or condition', () => {
+    const ql = new QL();
+    ql.measurement = 'http';
+    ql.condition('spdy', ['slow', 'fast']);
+    assert.equal(ql.toSelect(), 'select * from http where spdy = \'slow\' or spdy = \'fast\'');
+  });
+
   it('set tag condition', () => {
     const ql = new QL();
     ql.measurement = 'http';
