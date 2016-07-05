@@ -217,7 +217,7 @@ ql.condition({
   spdy: 'fast',
   type: '1',
 });
-ql.condition("use = 30 or use = 40");
+ql.condition("(use = 30 or use = 40)");
 ql.condition('use', [30, 40]);
 ```
 
