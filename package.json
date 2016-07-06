@@ -25,8 +25,8 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "eslint": "^2.9.0",
-    "eslint-config-airbnb": "^8.0.0",
-    "istanbul": "^0.4.4",
-    "mocha": "^2.5.3"
+    "eslint-config-airbnb": "^7.0.0",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.5"
   }
 }
