@@ -24,9 +24,12 @@
   "main": "lib/ql",
   "readmeFilename": "README.md",
   "devDependencies": {
-    "eslint": "^2.9.0",
-    "eslint-config-airbnb": "^7.0.0",
-    "istanbul": "^0.4.2",
-    "mocha": "^2.4.5"
+    "eslint": "^3.0.1",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-import": "^1.10.2",
+    "eslint-plugin-jsx-a11y": "^1.5.5",
+    "eslint-plugin-react": "^5.2.2",
+    "istanbul": "^0.4.4",
+    "mocha": "^2.5.3"
   }
 }

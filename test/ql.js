@@ -233,15 +233,17 @@ describe('influxdb-ql', () => {
   });
 
   it('createDatabase', () => {
-    assert.equal(QL.createDatabase('mydb'), 'create database "mydb"');
+    assert.equal(QL.createDatabase('mydb'), 'create database mydb');
   });
 
   it('createDatabaseNotExists', () => {
-    assert.equal(QL.createDatabaseNotExists('mydb'), 'create database if not exists "mydb"');
+    assert.equal(QL.createDatabaseNotExists('mydb'), 'create database if not exists mydb');
+    assert.equal(QL.createDatabaseNotExists('my db'), 'create database if not exists "my db"');
   });
 
   it('dropDatabase', () => {
-    assert.equal(QL.dropDatabase('mydb'), 'drop database "mydb"');
+    assert.equal(QL.dropDatabase('mydb'), 'drop database mydb');
+    assert.equal(QL.dropDatabase('my db'), 'drop database "my db"');
   });
 
   it('showDatabases', () => {
@@ -249,7 +251,8 @@ describe('influxdb-ql', () => {
   });
 
   it('showRetentionPolicies', () => {
-    assert.equal(QL.showRetentionPolicies('mydb'), 'show retention policies on "mydb"');
+    assert.equal(QL.showRetentionPolicies('mydb'), 'show retention policies on mydb');
+    assert.equal(QL.showRetentionPolicies('my db'), 'show retention policies on "my db"');
   });
 
   it('showMeasurements', () => {
@@ -258,16 +261,19 @@ describe('influxdb-ql', () => {
 
   it('showTagKeys', () => {
     assert.equal(QL.showTagKeys(), 'show tag keys');
-    assert.equal(QL.showTagKeys('http'), 'show tag keys from "http"');
+    assert.equal(QL.showTagKeys('http'), 'show tag keys from http');
+    assert.equal(QL.showTagKeys('http measurement'), 'show tag keys from "http measurement"');
   });
 
   it('showFieldKeys', () => {
     assert.equal(QL.showFieldKeys(), 'show field keys');
-    assert.equal(QL.showFieldKeys('http'), 'show field keys from "http"');
+    assert.equal(QL.showFieldKeys('http'), 'show field keys from http');
+    assert.equal(QL.showFieldKeys('http measurement'), 'show field keys from "http measurement"');
   });
 
   it('showSeries', () => {
     assert.equal(QL.showSeries(), 'show series');
-    assert.equal(QL.showSeries('http'), 'show series from "http"');
+    assert.equal(QL.showSeries('http'), 'show series from http');
+    assert.equal(QL.showSeries('http measurement'), 'show series from "http measurement"');
   });
 });

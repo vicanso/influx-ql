@@ -401,7 +401,7 @@ show tag keys
 
 ```js
 QL.showTagKeys(); // show tag keys
-QL.showTagKeys('http'); // show tag keys from "http"
+QL.showTagKeys('http'); // show tag keys from http
 ```
 
 ### showFieldKeys
@@ -412,7 +412,7 @@ show field keys
 
 ```js
 QL.showFieldKeys(); // show field keys
-QL.showFieldKeys('http'); // show field keys from "http"
+QL.showFieldKeys('http'); // show field keys from http
 ```
 
 ### showSeries
@@ -421,7 +421,7 @@ QL.showFieldKeys('http'); // show field keys from "http"
 
 ```js
 QL.showSeries(); // show series
-QL.showSeries('http'); // show series from "http"
+QL.showSeries('http'); // show series from http
 ```
 
 ## License
