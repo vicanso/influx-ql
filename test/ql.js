@@ -262,7 +262,7 @@ describe('influxdb-ql', () => {
     ql.addCalculate('count', 'use');
     ql.addGroup('time(5m)');
 
-    assert.equal(ql.toCQ(), 'create continuous query "combine-http" on mydb resample every 2m for 1m BEGIN select count(use) into mydb."default"."http copy" from mydb."default".http group by time(5m) END');
+    assert.equal(ql.toCQ(), 'create continuous query "combine-http" on mydb resample every 2m for 1m begin select count(use) into mydb."default"."http copy" from mydb."default".http group by time(5m) end');
   });
 
   it('createDatabase', () => {

@@ -424,6 +424,26 @@ QL.showSeries(); // show series
 QL.showSeries('http'); // show series from http
 ```
 
+
+### CQ
+
+```js
+const ql = new QL('mydb');
+
+ql.measurement = 'http';
+ql.into = 'http-count';
+
+ql.cqName = 'http-count-cq';
+
+ql.addCalculate('count', 'use');
+ql.addGroup('time(5m)');
+ql.start = '-5m';
+ql.cqEvery = '5m';
+// create continuous query "http-count-cq" on mydb resample every 5m begin select count(use) into mydb."default"."http-count" from mydb."default".http where time >= now() - 5m group by time(5m) end
+ql.toCQ();
+```
+
+
 ## License
 
 MIT
