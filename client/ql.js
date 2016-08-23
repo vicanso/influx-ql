@@ -60,10 +60,20 @@ function getFrom(data) {
   var arr = [];
   if (data.db) {
     arr.push(convert(data.db));
-    arr.push(data.rp);
+    arr.push(convert(data.intoRP || data.rp));
   }
   arr.push(convert(data.measurement));
   return 'from ' + arr.join('.');
+}
+
+function getInto(data) {
+  var arr = [];
+  if (data.db) {
+    arr.push(convert(data.db));
+    arr.push(convert(data.rp));
+  }
+  arr.push(convert(data.into));
+  return 'into ' + arr.join('.');
 }
 
 function getQL(data) {
@@ -134,6 +144,9 @@ var QL = function () {
 
   _createClass(QL, [{
     key: 'addField',
+
+    // CQ END
+
     value: function addField() {
       var args = Array.from(arguments).map(convert);
       addToArray(internal(this).fields, args);
@@ -277,12 +290,41 @@ var QL = function () {
       }
 
       if (data.into) {
-        arr.push('into ' + convert(data.into));
+        arr.push(getInto(data));
       }
 
       arr.push(getQL(data));
 
       return arr.join(' ');
+    }
+  }, {
+    key: 'toCQ',
+    value: function toCQ() {
+      var data = internal(this);
+      var arr = ['create continuous query ' + convert(data.cqName) + ' on ' + convert(data.db)];
+
+      if (data.cqEvery || data.cqFor) {
+        arr.push('resample');
+        if (data.cqEvery) {
+          arr.push('every ' + data.cqEvery);
+        }
+        if (data.cqFor) {
+          arr.push('for ' + data.cqFor);
+        }
+      }
+
+      arr.push('begin ' + this.toSelect() + ' end');
+
+      return arr.join(' ');
+    }
+  }, {
+    key: 'database',
+    set: function set(v) {
+      internal(this).db = v;
+      return this;
+    },
+    get: function get() {
+      return internal(this).db;
     }
   }, {
     key: 'RP',
@@ -292,6 +334,15 @@ var QL = function () {
     },
     get: function get() {
       return internal(this).rp;
+    }
+  }, {
+    key: 'intoRP',
+    set: function set(v) {
+      internal(this).intoRP = v;
+      return this;
+    },
+    get: function get() {
+      return internal(this).intoRP;
     }
   }, {
     key: 'measurement',
@@ -373,6 +424,36 @@ var QL = function () {
     },
     get: function get() {
       return internal(this).offset;
+    }
+
+    // CQ BEGIN
+
+  }, {
+    key: 'cqName',
+    set: function set(v) {
+      internal(this).cqName = v;
+      return this;
+    },
+    get: function get() {
+      return internal(this).cqName;
+    }
+  }, {
+    key: 'cqEvery',
+    set: function set(v) {
+      internal(this).cqEvery = v;
+      return this;
+    },
+    get: function get() {
+      return internal(this).cqEvery;
+    }
+  }, {
+    key: 'cqFor',
+    set: function set(v) {
+      internal(this).cqFor = v;
+      return this;
+    },
+    get: function get() {
+      return internal(this).cqFor;
     }
   }], [{
     key: 'createDatabase',
