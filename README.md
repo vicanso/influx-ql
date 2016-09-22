@@ -436,6 +436,9 @@ QL.showSeries('http'); // show series from http
 
 - `isDefault` set as default rp, default is false [optional]
 
+```js
+QL.createRP('two_hours', 'mydb', '2h');
+```
 
 ### CQ
 
