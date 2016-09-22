@@ -504,6 +504,25 @@ var QL = function () {
       }
       return ql;
     }
+  }, {
+    key: 'createRP',
+    value: function createRP(name, database, duration, replication, isDefault) {
+      if (!name || !database || !duration) {
+        throw new Error('name, database and duration can not be null');
+      }
+      var defaultValue = isDefault || false;
+      var rpl = replication || 1;
+      if (replication && util.isBoolean(replication)) {
+        defaultValue = replication;
+        rpl = isDefault || 1;
+      }
+      var arr = ['create retention policy "' + name + '" on "' + database + '"'];
+      arr.push('duration ' + duration + ' replication ' + rpl);
+      if (defaultValue) {
+        arr.push('default');
+      }
+      return arr.join(' ');
+    }
   }]);
 
   return QL;

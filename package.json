@@ -1,11 +1,8 @@
 {
   "name": "influx-ql",
-  "description": "get influx ql",
-  "version": "1.0.0",
-  "author": {
-    "name": "vicanso 小墨鱼",
-    "email": "vicansocanbico@gmail.com"
-  },
+  "description": "Simple way for influx ql",
+  "version": "1.0.1",
+  "author": "Tree Xie <vicansocanbico@gmail.com>",
   "keywords": [
     "influxdb",
     "ql"

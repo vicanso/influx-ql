@@ -424,6 +424,18 @@ QL.showSeries(); // show series
 QL.showSeries('http'); // show series from http
 ```
 
+### createRP
+
+- `name` the retention policy name
+
+- `database` the database name
+
+- `duration` duration, eg: '2h'
+
+- `replication` 1 for single node instances, default is 1 [optional]
+
+- `isDefault` set as default rp, default is false [optional]
+
 
 ### CQ
 
