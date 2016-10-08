@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -38,41 +38,87 @@ function getTimeCondition(time, type) {
 function addToArray(arr, args) {
   /* istanbul ignore else */
   if (args && args.length) {
+    /* eslint prefer-spread:0 */
     arr.push.apply(arr, args);
   }
 }
 
 function removeFromArray(arr, args) {
   return arr.filter(function (item) {
-    return !~args.indexOf(item);
+    return args.indexOf(item) === -1;
   });
 }
 
 function convert(field) {
+  var f = field.toLowerCase();
+  var digitReg = /^[0-9]/;
+  var reg = /[^a-z0-9_]/;
   /* istanbul ignore else */
-  if (/[\s-]/.test(field)) {
+  if (digitReg.test(f) || reg.test(f)) {
     return '"' + field + '"';
   }
   return field;
 }
 
+function convertField(field) {
+  // field + x
+  if (field.indexOf('+') !== -1) {
+    return field;
+  }
+  return '"' + field + '"';
+}
+
+function convertConditionKey(key) {
+  // key + x
+  if (key.indexOf('+') !== -1) {
+    return key;
+  }
+  return '"' + key + '"';
+}
+
+function isRegExp(value) {
+  return value.charAt(0) === '/' && value.charAt(value.length - 1) === '/';
+}
+
+function convertConditionValue(value) {
+  if (util.isString(value) && !isRegExp(value)) {
+    return '\'' + value + '\'';
+  }
+  return value;
+}
+
+function convertGroupValue(value) {
+  var reg = /time\(\S+\)/;
+  if (value === '*' || value.match(reg)) {
+    return value;
+  }
+  return '"' + value + '"';
+}
+
+function convertMeasurement(measurement) {
+  if (measurement.charAt(0) === ':' || isRegExp(measurement)) {
+    return measurement;
+  }
+  return '"' + measurement + '"';
+}
+
 function getFrom(data) {
   var arr = [];
   if (data.db) {
-    arr.push(convert(data.db));
-    arr.push(convert(data.intoRP || data.rp));
+    arr.push('"' + data.db + '"');
+    arr.push('"' + data.rp + '"');
   }
-  arr.push(convert(data.measurement));
+  arr.push(convertMeasurement(data.measurement));
   return 'from ' + arr.join('.');
 }
 
 function getInto(data) {
   var arr = [];
-  if (data.db) {
-    arr.push(convert(data.db));
-    arr.push(convert(data.rp));
+  if (data.intoDB) {
+    arr.push('"' + data.intoDB + '"');
+    arr.push('"' + data.intoRP + '"');
   }
-  arr.push(convert(data.into));
+  arr.push(convertMeasurement(data.into));
   return 'into ' + arr.join('.');
 }
 
@@ -95,9 +141,9 @@ function getQL(data) {
   }
 
   if (groups && groups.length) {
-    arr.push('group by ' + groups.sort().join(','));
+    arr.push('group by ' + groups.sort().map(convertGroupValue).join(','));
 
-    if (util.isNumber(data.fill)) {
+    if (data.fill) {
       arr.push('fill(' + data.fill + ')');
     }
   }
@@ -118,13 +164,17 @@ function getQL(data) {
     arr.push('offset ' + data.offset);
   }
 
+  if (data.soffset) {
+    arr.push('soffset ' + data.soffset);
+  }
+
   return arr.join(' ');
 }
 
 function showKeys(type, measurement) {
   var ql = 'show ' + type + ' keys';
   if (measurement) {
-    ql = ql + ' from ' + convert(measurement);
+    ql = ql + ' from "' + measurement + '"';
   }
   return ql;
 }
@@ -138,7 +188,8 @@ var QL = function () {
     data.conditions = [];
     data.calculations = [];
     data.groups = [];
-    data.rp = '"default"';
+    data.rp = 'default';
+    data.intoRP = 'default';
     data.db = db;
   }
 
@@ -148,7 +199,7 @@ var QL = function () {
     // CQ END
 
     value: function addField() {
-      var args = Array.from(arguments).map(convert);
+      var args = Array.from(arguments);
       addToArray(internal(this).fields, args);
       return this;
     }
@@ -157,6 +208,13 @@ var QL = function () {
     value: function removeField() {
       var data = internal(this);
       data.fields = removeFromArray(data.fields, Array.from(arguments));
+      return this;
+    }
+  }, {
+    key: 'removeAllField',
+    value: function removeAllField() {
+      var data = internal(this);
+      data.fields.length = 0;
       return this;
     }
   }, {
@@ -180,9 +238,10 @@ var QL = function () {
     }
   }, {
     key: 'condition',
-    value: function condition(k, v) {
+    value: function condition(k, v, op) {
       var _this = this;
 
+      var operator = op || '=';
       if (util.isObject(k)) {
         var _ret = function () {
           var target = k;
@@ -199,25 +258,19 @@ var QL = function () {
       }
       if (k && v) {
         (function () {
-          var key = convert(k);
+          var key = convertConditionKey(k);
           if (util.isArray(v)) {
             (function () {
               var arr = [];
               v.forEach(function (_v) {
-                var tmp = _v;
-                if (util.isString(tmp)) {
-                  tmp = '\'' + tmp + '\'';
-                }
-                arr.push(key + ' = ' + tmp);
+                var tmp = convertConditionValue(_v);
+                arr.push(key + ' ' + operator + ' ' + tmp);
               });
               _this.addCondition('(' + arr.join(' or ') + ')');
             })();
           } else {
-            var tmp = v;
-            if (util.isString(tmp)) {
-              tmp = '\'' + tmp + '\'';
-            }
-            _this.addCondition(key + ' = ' + tmp);
+            var tmp = convertConditionValue(v);
+            _this.addCondition(key + ' ' + operator + ' ' + tmp);
           }
         })();
       } else if (k) {
@@ -239,7 +292,7 @@ var QL = function () {
     key: 'addCalculate',
     value: function addCalculate(type, field) {
       if (type && field) {
-        internal(this).calculations.push(type + '(' + field + ')');
+        internal(this).calculations.push(type + '(' + convertField(field) + ')');
       }
       return this;
     }
@@ -248,7 +301,7 @@ var QL = function () {
     value: function removeCalculate(type, field) {
       if (type && field) {
         var data = internal(this);
-        data.calculations = removeFromArray(data.calculations, type + '(' + field + ')');
+        data.calculations = removeFromArray(data.calculations, type + '(' + convertField(field) + ')');
       }
       return this;
     }
@@ -261,16 +314,23 @@ var QL = function () {
   }, {
     key: 'addGroup',
     value: function addGroup() {
-      var args = Array.from(arguments).map(convert);
+      var args = Array.from(arguments);
       addToArray(internal(this).groups, args);
       return this;
     }
   }, {
     key: 'removeGroup',
     value: function removeGroup() {
-      var args = Array.from(arguments).map(convert);
+      var args = Array.from(arguments);
       var data = internal(this);
       data.groups = removeFromArray(data.groups, args);
+      return this;
+    }
+  }, {
+    key: 'removeAllGroup',
+    value: function removeAllGroup() {
+      var data = internal(this);
+      data.groups.length = 0;
       return this;
     }
   }, {
@@ -284,7 +344,7 @@ var QL = function () {
       if (calculations && calculations.length) {
         arr.push(calculations.sort().join(','));
       } else if (fields && fields.length) {
-        arr.push(fields.sort().join(','));
+        arr.push(fields.sort().map(convertField).join(','));
       } else {
         arr.push('*');
       }
@@ -301,7 +361,7 @@ var QL = function () {
     key: 'toCQ',
     value: function toCQ() {
       var data = internal(this);
-      var arr = ['create continuous query ' + convert(data.cqName) + ' on ' + convert(data.db)];
+      var arr = ['create continuous query ' + convert(data.cqName) + ' on "' + data.db + '"'];
 
       if (data.cqEvery || data.cqFor) {
         arr.push('resample');
@@ -325,6 +385,15 @@ var QL = function () {
     },
     get: function get() {
       return internal(this).db;
+    }
+  }, {
+    key: 'intoDatabase',
+    set: function set(v) {
+      internal(this).intoDB = v;
+      return this;
+    },
+    get: function get() {
+      return internal(this).intoDB;
     }
   }, {
     key: 'RP',
@@ -425,6 +494,15 @@ var QL = function () {
     get: function get() {
       return internal(this).offset;
     }
+  }, {
+    key: 'soffset',
+    set: function set(v) {
+      internal(this).soffset = v;
+      return this;
+    },
+    get: function get() {
+      return internal(this).soffset;
+    }
 
     // CQ BEGIN
 
@@ -500,7 +578,7 @@ var QL = function () {
     value: function showSeries(measurement) {
       var ql = 'show series';
       if (measurement) {
-        ql = ql + ' from ' + convert(measurement);
+        ql = ql + ' from "' + measurement + '"';
       }
       return ql;
     }
