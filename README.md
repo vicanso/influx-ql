@@ -20,9 +20,9 @@ ql.end = '-3h';
 ql.limit = 10;
 ql.slimit = 5;
 ql.condition('code', 400);
-ql.addCondition('use <= 30');
+ql.addCondition('"use" <= 30');
 ql.fill = 0;
-// select "fetch time",spdy,status from mydb."default".http where code = 400 and time <= now() - 3h and time >= '2016-01-01' and use <= 30 fill(0) limit 10 slimit 5
+// select "fetch time",spdy,status from "mydb"."default"."http" where "code" = 400 and time <= now() - 3h and time >= '2016-01-01' and "use" <= 30 fill(0) limit 10 slimit 5
 ql.toSelect();
 ```
 
@@ -169,6 +169,17 @@ ql.addField('status');
 ql.removeField('status');
 ```
 
+### removeAllField
+
+ remove all query result field
+
+ ```js
+const QL = require('influx-ql');
+const ql = new QL();
+ql.addField('status');
+ql.removeAllField();
+```
+
 ### addCondition
 
 add custom query condition
@@ -207,6 +218,8 @@ ql.removeAllCondition();
 
 - `value` query field value
 
+- `operator` condition operator, default is '='
+
 add custom query condition, the same as `addCondition(key + '=' + value)`
 
 ```js
@@ -219,6 +232,8 @@ ql.condition({
 });
 ql.condition("(use = 30 or use = 40)");
 ql.condition('use', [30, 40]);
+// "location" !~ /./
+ql.condition('location', '/./', '!~');
 ```
 
 ### tag
@@ -316,6 +331,16 @@ ql.addGroup('spdy', 'time(6h)');
 ql.removeGroup('spdy');
 ```
 
+### removeAllGroup
+
+remove all group
+
+```js
+const QL = require('influx-ql');
+const ql = new QL();
+ql.addGroup('spdy', 'time(6h)');
+ql.removeAllGroup();
+```
 
 ### toSelect
 
