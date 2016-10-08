@@ -22,7 +22,7 @@ ql.slimit = 5;
 ql.condition('code', 400);
 ql.addCondition('"use" <= 30');
 ql.fill = 0;
-// select "fetch time",spdy,status from "mydb"."default"."http" where "code" = 400 and time <= now() - 3h and time >= '2016-01-01' and "use" <= 30 fill(0) limit 10 slimit 5
+// select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= '2016-01-01' limit 10 slimit 5
 ql.toSelect();
 ```
 
@@ -49,6 +49,30 @@ const QL = require('influx-ql');
 const ql = new QL('mydb');
 ```
 
+### database
+
+set/get database
+
+```js
+const QL = require('influx-ql');
+const ql = new QL();
+ql.database = 'mydb';
+// mydb
+console.info(ql.database);
+```
+
+### intoDatabase
+
+set/get into database
+
+```js
+const QL = require('influx-ql');
+const ql = new QL();
+ql.intoDatabase = 'mydb-copy';
+// mydb-copy
+console.info(ql.intoDatabase);
+```
+
 ### RP
 
 set/get retention policy
@@ -59,6 +83,18 @@ const ql = new QL('mydb');
 ql.RP = 'rp-test';
 // rp-test
 console.info(ql.RP);
+```
+
+### intoRP
+
+set/get into RP
+
+```js
+const QL = require('influx-ql');
+const ql = new QL();
+ql.intoRP = 'copy-rp';
+// copy-rp
+console.info(ql.intoRP);
 ```
 
 ### measurement
@@ -148,6 +184,16 @@ const ql = new QL();
 ql.offset = 10;
 ```
 
+### soffset
+
+set/get soffset value
+
+```js
+const QL = require('influx-ql');
+const ql = new QL();
+ql.soffset = 10;
+```
+
 ### addField
 
 add query result field, if fields is empty, will get all fields.
@@ -171,9 +217,9 @@ ql.removeField('status');
 
 ### removeAllField
 
- remove all query result field
+remove all query result field
 
- ```js
+```js
 const QL = require('influx-ql');
 const ql = new QL();
 ql.addField('status');
@@ -358,7 +404,7 @@ ql.slimit = 5;
 ql.condition('code', 400);
 ql.addCondition('use <= 30');
 ql.fill = 0;
-// select "fetch time",spdy,status from mydb."default".http where code = 400 and time <= now() - 3h and time >= '2016-01-01' and use <= 30 fill(0) limit 10 slimit 5
+// select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and time <= now() - 3h and time >= '2016-01-01' and use <= 30 limit 10 slimit 5
 ql.toSelect();
 ```
 
@@ -479,7 +525,7 @@ ql.addCalculate('count', 'use');
 ql.addGroup('time(5m)');
 ql.start = '-5m';
 ql.cqEvery = '5m';
-// create continuous query "http-count-cq" on mydb resample every 5m begin select count(use) into mydb."default"."http-count" from mydb."default".http where time >= now() - 5m group by time(5m) end
+// create continuous query "http-count-cq" on "mydb" resample every 5m begin select count("use") into "http-count" from "mydb"."default"."http" where time >= now() - 5m group by time(5m) end
 ql.toCQ();
 ```
 
