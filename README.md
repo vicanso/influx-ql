@@ -14,15 +14,19 @@ Get influx ql
 const QL = require('influx-ql');
 const ql = new QL('mydb');
 ql.measurement = 'http';
+ql.RP = 'default';
 ql.addField('status', 'spdy', 'fetch time');
 ql.start = '2016-01-01';
 ql.end = '-3h';
 ql.limit = 10;
 ql.slimit = 5;
+ql.order = 'desc';
+ql.offset = 10;
+ql.soffset = 5;
 ql.condition('code', 400);
 ql.addCondition('"use" <= 30');
 ql.fill = 0;
-// select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= '2016-01-01' limit 10 slimit 5
+// select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= '2016-01-01' order by time desc limit 10 slimit 5 offset 10 soffset 5
 ql.toSelect();
 ```
 
