@@ -106,7 +106,11 @@ function getFrom(data) {
   var arr = [];
   if (data.db) {
     arr.push('"' + data.db + '"');
-    arr.push('"' + data.rp + '"');
+    if (data.rp) {
+      arr.push('"' + data.rp + '"');
+    } else {
+      arr.push('');
+    }
   }
   arr.push(convertMeasurement(data.measurement));
   return 'from ' + arr.join('.');
@@ -116,7 +120,11 @@ function getInto(data) {
   var arr = [];
   if (data.intoDB) {
     arr.push('"' + data.intoDB + '"');
-    arr.push('"' + data.intoRP + '"');
+    if (data.intoRP) {
+      arr.push('"' + data.intoRP + '"');
+    } else {
+      arr.push('');
+    }
   }
   arr.push(convertMeasurement(data.into));
   return 'into ' + arr.join('.');
@@ -143,7 +151,7 @@ function getQL(data) {
   if (groups && groups.length) {
     arr.push('group by ' + groups.sort().map(convertGroupValue).join(','));
 
-    if (data.fill) {
+    if (!util.isNullOrUndefined(data.fill)) {
       arr.push('fill(' + data.fill + ')');
     }
   }
@@ -188,8 +196,8 @@ var QL = function () {
     data.conditions = [];
     data.calculations = [];
     data.groups = [];
-    data.rp = 'default';
-    data.intoRP = 'default';
+    data.rp = '';
+    data.intoRP = '';
     data.db = db;
   }
 
