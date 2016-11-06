@@ -35,7 +35,7 @@ describe('influxdb-ql', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
     assert.equal(ql.measurement, 'http');
-    assert.equal(ql.toSelect(), 'select * from "mydb"."default"."http"');
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
 
     ql.RP = 'rp';
     assert.equal(ql.RP, 'rp');
@@ -226,12 +226,12 @@ describe('influxdb-ql', () => {
     assert.equal(ql.database, 'mydb');
 
     ql.into = 'http copy';
-    assert.equal(ql.toSelect(), 'select * into "http copy" from "mydb"."default"."http"');
+    assert.equal(ql.toSelect(), 'select * into "http copy" from "mydb".."http"');
 
     ql.intoDatabase = 'mydb';
     ql.intoRP = 'my-rp';
     assert.equal(ql.intoRP, 'my-rp');
-    assert.equal(ql.toSelect(), 'select * into "mydb"."my-rp"."http copy" from "mydb"."default"."http"');
+    assert.equal(ql.toSelect(), 'select * into "mydb"."my-rp"."http copy" from "mydb".."http"');
   });
 
   it('order', () => {
@@ -266,7 +266,7 @@ describe('influxdb-ql', () => {
     ql.addCalculate('count', 'use');
     ql.addGroup('time(5m)');
 
-    assert.equal(ql.toCQ(), 'create continuous query "combine-http" on "mydb" resample every 2m for 1m begin select count("use") into "mydb"."default"."http copy" from "mydb"."default"."http" group by time(5m) end');
+    assert.equal(ql.toCQ(), 'create continuous query "combine-http" on "mydb" resample every 2m for 1m begin select count("use") into "mydb".."http copy" from "mydb".."http" group by time(5m) end');
   });
 
   it('createDatabase', () => {
