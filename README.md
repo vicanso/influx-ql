@@ -515,6 +515,16 @@ QL.showSeries('http'); // show series from http
 QL.createRP('two_hours', 'mydb', '2h');
 ```
 
+### dropRP
+
+- `name` the retention policy name
+
+- `database` the database name
+
+```js
+QL.dropRP('two_hours', 'mydb');
+```
+
 ### CQ
 
 ```js
