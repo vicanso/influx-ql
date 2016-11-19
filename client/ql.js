@@ -609,6 +609,11 @@ var QL = function () {
       }
       return arr.join(' ');
     }
+  }, {
+    key: 'dropRP',
+    value: function dropRP(name, database) {
+      return 'drop retention policy "' + name + '" on "' + database + '"';
+    }
   }]);
 
   return QL;
