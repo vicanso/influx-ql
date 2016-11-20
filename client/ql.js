@@ -638,7 +638,7 @@ var QL = function () {
       var defaultValue = getParam(args, util.isBoolean);
       var rpl = getParam(args, util.isNumber);
       var shdDuration = getParam(args, util.isString);
-      var arr = ['alert retention policy "' + name + '" on "' + database + '"'];
+      var arr = ['alter retention policy "' + name + '" on "' + database + '"'];
       if (duration) {
         arr.push('duration ' + duration);
       }

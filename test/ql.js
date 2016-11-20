@@ -325,7 +325,7 @@ describe('influxdb-ql', () => {
   });
 
   it('updateRP', () => {
-    assert.equal(QL.updateRP('two_hours', 'mydb', '2w', 1, '5m', true), 'alert retention policy "two_hours" on "mydb" duration 2w replication 1 shard duration 5m default');
+    assert.equal(QL.updateRP('two_hours', 'mydb', '2w', 1, '5m', true), 'alter retention policy "two_hours" on "mydb" duration 2w replication 1 shard duration 5m default');
   });
 });
 
