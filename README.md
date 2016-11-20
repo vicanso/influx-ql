@@ -515,6 +515,24 @@ QL.showSeries('http'); // show series from http
 QL.createRP('two_hours', 'mydb', '2h');
 ```
 
+### updateRP
+
+- `name` the retention policy name
+
+- `database` the database name
+
+- `duration` duration, eg: '2h'
+
+- `replication` 1 for single node instances, default is 1 [optional]
+
+- `shardDuration` shard duration, eg: '30m'
+
+- `isDefault` set as default rp, default is false [optional]
+
+```js
+QL.updateRP('two_hours', 'mydb', '2h', 2, '30m', true);
+```
+
 ### dropRP
 
 - `name` the retention policy name

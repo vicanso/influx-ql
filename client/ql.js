@@ -9,6 +9,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var internal = require('./internal');
 var util = require('util');
 
+function getParam(args, is, defaultValue) {
+  var result = void 0;
+  args.forEach(function (v) {
+    if (!util.isUndefined(result)) {
+      return;
+    }
+    if (is(v)) {
+      result = v;
+    }
+  });
+  if (util.isUndefined(result)) {
+    result = defaultValue;
+  }
+  return result;
+}
+
 function validate(data, keys) {
   var notSetKeys = [];
   keys.forEach(function (key) {
@@ -596,12 +612,10 @@ var QL = function () {
       if (!name || !database || !duration) {
         throw new Error('name, database and duration can not be null');
       }
-      var defaultValue = isDefault || false;
-      var rpl = replication || 1;
-      if (replication && util.isBoolean(replication)) {
-        defaultValue = replication;
-        rpl = isDefault || 1;
-      }
+      var args = [replication, isDefault];
+      var defaultValue = getParam(args, util.isBoolean);
+      var rpl = getParam(args, util.isNumber, 1);
+
       var arr = ['create retention policy "' + name + '" on "' + database + '"'];
       arr.push('duration ' + duration + ' replication ' + rpl);
       if (defaultValue) {
@@ -613,6 +627,31 @@ var QL = function () {
     key: 'dropRP',
     value: function dropRP(name, database) {
       return 'drop retention policy "' + name + '" on "' + database + '"';
+    }
+  }, {
+    key: 'updateRP',
+    value: function updateRP(name, database, duration, replication, shardDuration, isDefault) {
+      if (!name || !database || !duration) {
+        throw new Error('name, database and duration can not be null');
+      }
+      var args = [replication, shardDuration, isDefault];
+      var defaultValue = getParam(args, util.isBoolean);
+      var rpl = getParam(args, util.isNumber);
+      var shdDuration = getParam(args, util.isString);
+      var arr = ['alert retention policy "' + name + '" on "' + database + '"'];
+      if (duration) {
+        arr.push('duration ' + duration);
+      }
+      if (rpl) {
+        arr.push('replication ' + rpl);
+      }
+      if (shdDuration) {
+        arr.push('shard duration ' + shdDuration);
+      }
+      if (defaultValue) {
+        arr.push('default');
+      }
+      return arr.join(' ');
     }
   }]);
 
