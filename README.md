@@ -509,6 +509,8 @@ QL.showSeries('http'); // show series from http
 
 - `replication` 1 for single node instances, default is 1 [optional]
 
+- `shardDuration` shard duration, eg: '30m'
+
 - `isDefault` set as default rp, default is false [optional]
 
 ```js

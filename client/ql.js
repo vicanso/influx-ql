@@ -608,16 +608,24 @@ var QL = function () {
     }
   }, {
     key: 'createRP',
-    value: function createRP(name, database, duration, replication, isDefault) {
+    value: function createRP(name, database, duration, replication, shardDuration, isDefault) {
       if (!name || !database || !duration) {
         throw new Error('name, database and duration can not be null');
       }
-      var args = [replication, isDefault];
+      var args = [replication, shardDuration, isDefault];
       var defaultValue = getParam(args, util.isBoolean);
       var rpl = getParam(args, util.isNumber, 1);
-
+      var shdDuration = getParam(args, util.isString);
       var arr = ['create retention policy "' + name + '" on "' + database + '"'];
-      arr.push('duration ' + duration + ' replication ' + rpl);
+      if (duration) {
+        arr.push('duration ' + duration);
+      }
+      if (rpl) {
+        arr.push('replication ' + rpl);
+      }
+      if (shdDuration) {
+        arr.push('shard duration ' + shdDuration);
+      }
       if (defaultValue) {
         arr.push('default');
       }
@@ -632,14 +640,14 @@ var QL = function () {
     key: 'updateRP',
     value: function updateRP(name, database, duration, replication, shardDuration, isDefault) {
       if (!name || !database || !duration) {
-        throw new Error('name, database and duration can not be null');
+        throw new Error('name and database can not be null');
       }
       var args = [replication, shardDuration, isDefault];
       var defaultValue = getParam(args, util.isBoolean);
       var rpl = getParam(args, util.isNumber);
       var shdDuration = getParam(args, util.isString);
       var arr = ['alter retention policy "' + name + '" on "' + database + '"'];
-      if (duration) {
+      if (duration && duration !== '0') {
         arr.push('duration ' + duration);
       }
       if (rpl) {

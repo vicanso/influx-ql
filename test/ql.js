@@ -316,8 +316,11 @@ describe('influxdb-ql', () => {
 
   it('createRP', () => {
     assert.equal(QL.createRP('two_hours', 'mydb', '2h'), 'create retention policy "two_hours" on "mydb" duration 2h replication 1');
+
     assert.equal(QL.createRP('two_hours', 'mydb', '2h', 1, true), 'create retention policy "two_hours" on "mydb" duration 2h replication 1 default');
     assert.equal(QL.createRP('two_hours', 'mydb', '2h', true, 2), 'create retention policy "two_hours" on "mydb" duration 2h replication 2 default');
+
+    assert.equal(QL.createRP('two_hours', 'mydb', '2d', '1h', true, 2), 'create retention policy "two_hours" on "mydb" duration 2d replication 2 shard duration 1h default');
   });
 
   it('dropRP', () => {
@@ -325,6 +328,8 @@ describe('influxdb-ql', () => {
   });
 
   it('updateRP', () => {
+    assert.equal(QL.updateRP('two_hours', 'mydb', '0', 1, '5m', false), 'alter retention policy "two_hours" on "mydb" replication 1 shard duration 5m');
+
     assert.equal(QL.updateRP('two_hours', 'mydb', '2w', 1, '5m', true), 'alter retention policy "two_hours" on "mydb" duration 2w replication 1 shard duration 5m default');
   });
 });
