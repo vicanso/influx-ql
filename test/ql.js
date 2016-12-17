@@ -59,7 +59,6 @@ describe('influxdb-ql', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
     ql.condition('spdy', ['1', '2']);
-    console.info(ql.toSelect());
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" = \'1\' or "spdy" = \'2\')');
   });
 
@@ -90,7 +89,7 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" != \'1\' and "method" != \'GET\')');
   });
 
-  it('condition({spdy: "1", method: "GET"}), "or"', () => {
+  it('condition({spdy: "1", method: "GET"}, "or")', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
     ql.condition({
@@ -100,18 +99,19 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" = \'1\' or "method" = \'GET\')');
   });
 
-  it('condition("spdy = \'1\' and method = \'GET\')', () => {
+  it('condition("spdy = \'1\' and method = \'GET\'")', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
     ql.condition("spdy = '1' and method = 'GET'");
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where (spdy = \'1\' and method = \'GET\')');
   });
 
-  it('condition({spdy: /1|2/})', () => {
+  it('condition({spdy: "/1|2/"})', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition({spdy: /1|2/});
-    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "spdy" = /1|2/');
+    ql.condition({spdy: '/1|2/'});
+    ql.condition({method: /GET/});
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = /GET/ and "spdy" = /1|2/');
   });
 
   it('call condition twice', () => {

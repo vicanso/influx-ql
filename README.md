@@ -30,6 +30,51 @@ ql.fill = 0;
 ql.toSelect();
 ```
 
+The enhance condition function
+
+```js
+const QL = require('influx-ql');
+const ql = new QL('mydb');
+ql.measurement = 'http';
+
+// select * from "mydb".."http" where "spdy" = '1'
+ql.condition("spdy", "1");
+ql.emptyConditions();
+
+// select * from "mydb".."http" where ("spdy" = '1' or "spdy" = '2')
+ql.condition("spdy", ["1", "2"]);
+ql.emptyConditions();
+
+// select * from "mydb".."http" where "use" >= 300
+ql.condition("use", 300, ">=");
+ql.emptyConditions();
+
+// select * from "mydb".."http" where ("spdy" = '1' and "method" = 'GET')
+ql.condition({spdy: "1", method: "GET"});
+ql.emptyConditions();
+
+// select * from "mydb".."http" where ("spdy" != '1' and "method" != 'GET')
+ql.condition({spdy: "1", method: "GET"}, '!=');
+ql.emptyConditions();
+
+// select * from "mydb".."http" where ("spdy" = '1' or "method" = 'GET')
+ql.condition({spdy: "1", method: "GET"}, "or");
+ql.emptyConditions();
+
+// select * from "mydb".."http" where (spdy = '1' and method = 'GET')
+ql.condition("spdy = '1' and method = 'GET'");
+ql.emptyConditions();
+
+// select * from "mydb".."http" where "spdy" = /1|2/
+ql.condition({spdy: /1|2/});
+ql.emptyConditions();
+
+// select * from "mydb".."http" where "method" = 'GET' or "spdy" = '1'
+ql.condition('spdy', '1');
+ql.condition('method', 'GET');
+ql.relation = 'or';
+```
+
 ## Installation
 
 ```bash
