@@ -87,7 +87,7 @@ View the [./examples](examples) directory for working examples.
 
 ## API
 
-[API](https://vicanso.github.io/influxdb-ql/QL.html)
+[API](https://vicanso.github.io/influx-ql/QL.html)
 
 ## License
 
