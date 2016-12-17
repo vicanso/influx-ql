@@ -7,7 +7,7 @@ ql.into = 'http-count';
 
 ql.cqName = 'http-count-cq';
 
-ql.addCalculate('count', 'use');
+ql.addFunction('count', 'use');
 ql.addGroup('time(5m)');
 ql.start = '-5m';
 ql.cqEvery = '5m';

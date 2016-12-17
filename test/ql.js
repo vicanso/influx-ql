@@ -3,6 +3,28 @@ const assert = require('assert');
 const QL = require('..');
 
 describe('influxdb-ql', () => {
+
+  it('getter/seter', () => {
+    const ql = new QL();
+    const attrList = [
+      'series',
+      'start',
+      'end',
+      'limit',
+      'slimit',
+      'fill',
+      'into',
+      'order',
+      'offset',
+      'rp'
+    ];
+    attrList.forEach((attr) => {
+      const v = 1;
+      ql[attr] = v;
+      assert.equal(ql[attr], v);
+    });
+  });
+
   it('addField', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
@@ -31,6 +53,14 @@ describe('influxdb-ql', () => {
     ql.measurement = 'http';
     ql.condition('spdy', '1');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "spdy" = \'1\'');
+  });
+
+  it('condition("spdy", ["1", "2"])', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.condition('spdy', ['1', '2']);
+    console.info(ql.toSelect());
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" = \'1\' or "spdy" = \'2\')');
   });
 
   it('condition("use", 300, ">=")', () => {
@@ -70,6 +100,20 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" = \'1\' or "method" = \'GET\')');
   });
 
+  it('condition("spdy = \'1\' and method = \'GET\')', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.condition("spdy = '1' and method = 'GET'");
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where (spdy = \'1\' and method = \'GET\')');
+  });
+
+  it('condition({spdy: /1|2/})', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.condition({spdy: /1|2/});
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "spdy" = /1|2/');
+  });
+
   it('call condition twice', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
@@ -81,7 +125,69 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = \'GET\' or "spdy" = \'1\'');
   });
 
-  return;
+  it('emptyConditions', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.condition('spdy', '1');
+    ql.condition('method', 'GET');
+    ql.emptyConditions();
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
+  });
+
+  it('addFunction', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addGroup('spdy');
+    ql.addFunction('count', 'use');
+    assert.equal(ql.toSelect(), 'select count("use") from "mydb".."http" group by "spdy"');
+  });
+
+  it('removeFunction', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addGroup('spdy');
+    ql.addFunction('count', 'use');
+    ql.addFunction('mean', 'use');
+    ql.removeFunction('count', 'use');
+    assert.equal(ql.toSelect(), 'select mean("use") from "mydb".."http" group by "spdy"');
+  });
+
+  it('emptyFunctions', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addGroup('spdy');
+    ql.addFunction('count', 'use');
+    ql.addFunction('mean', 'use');
+    ql.emptyFunctions();
+    ql.addFunction('count', 'url');
+    assert.equal(ql.toSelect(), 'select count("url") from "mydb".."http" group by "spdy"');
+  });
+
+  it('addGroup', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addGroup('spdy', 'method');
+    ql.addFunction('count', 'use');
+    assert.equal(ql.toSelect(), 'select count("use") from "mydb".."http" group by "method","spdy"');
+  });
+
+  it('removeGroup', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addGroup('spdy', 'method');
+    ql.addFunction('count', 'use');
+    ql.removeGroup('spdy');
+    assert.equal(ql.toSelect(), 'select count("use") from "mydb".."http" group by "method"');
+  });
+
+  it('emptyGroups', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addGroup('spdy', 'method');
+    ql.emptyGroups();
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
+  });
+
   it('select *', () => {
     const ql = new QL();
     ql.measurement = 'http';
@@ -97,7 +203,6 @@ describe('influxdb-ql', () => {
     assert.equal(ql.RP, 'rp');
     assert.equal(ql.toSelect(), 'select * from "mydb"."rp"."http"');
   });
-  return;
   it('select field', () => {
     const ql = new QL();
     ql.measurement = 'http';
@@ -164,22 +269,24 @@ describe('influxdb-ql', () => {
     const ql = new QL();
     ql.measurement = 'http';
 
-    ql.addCondition('"code" = 500', '"spdy" = 1');
-    assert.equal(ql.toSelect(), 'select * from "http" where "code" = 500 and "spdy" = 1');
+    ql.condition({
+      code: 500,
+      spdy: '1',
+    });
+    assert.equal(ql.toSelect(), 'select * from "http" where ("code" = 500 and "spdy" = \'1\')');
 
-    ql.removeCondition('"code" = 500');
     ql.condition('code', 404);
-    assert.equal(ql.toSelect(), 'select * from "http" where "code" = 404 and "spdy" = 1');
+    ql.relation = 'or';
+    assert.equal(ql.toSelect(), 'select * from "http" where "code" = 404 or ("code" = 500 and "spdy" = \'1\')');
 
-    ql.removeAllCondition();
+    ql.emptyConditions();
     ql.condition('spdy', 'slow');
     assert.equal(ql.toSelect(), 'select * from "http" where "spdy" = \'slow\'');
 
-    ql.removeAllCondition();
+    ql.emptyConditions();
     ql.condition('http spdy', 'slow');
     assert.equal(ql.toSelect(), 'select * from "http" where "http spdy" = \'slow\'');
   });
-
   it('add or condition', () => {
     const ql = new QL();
     ql.measurement = 'http';
@@ -187,44 +294,21 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from "http" where ("spdy" = \'slow\' or "spdy" = \'fast\')');
   });
 
-  it('set tag condition', () => {
+
+  it('function', () => {
     const ql = new QL();
     ql.measurement = 'http';
 
-    ql.tag('spdy', 'slow');
-    ql.tag({
-      type: '0'
-    });
-
-    assert.equal(ql.toSelect(), 'select * from "http" where "spdy" = \'slow\' and "type" = \'0\'');
-  });
-
-  it('set field condition', () => {
-    const ql = new QL();
-    ql.measurement = 'http';
-
-    ql.field('use', 3000);
-    ql.field({
-      code: 400
-    });
-
-    assert.equal(ql.toSelect(), 'select * from "http" where "code" = 400 and "use" = 3000');
-  });
-
-  it('calculate', () => {
-    const ql = new QL();
-    ql.measurement = 'http';
-
-    ql.addCalculate('mean', 'use');
+    ql.addFunction('mean', 'use');
     assert.equal(ql.toSelect(), 'select mean("use") from "http"');
 
-    ql.addCalculate('count', 'use');
+    ql.addFunction('count', 'use');
     assert.equal(ql.toSelect(), 'select count("use"),mean("use") from "http"');
 
-    ql.removeCalculate('count', 'use');
+    ql.removeFunction('count', 'use');
     assert.equal(ql.toSelect(), 'select mean("use") from "http"');
 
-    ql.removeAllCalculate();
+    ql.emptyFunctions();
     assert.equal(ql.toSelect(), 'select * from "http"');
   });
 
@@ -234,7 +318,7 @@ describe('influxdb-ql', () => {
     ql.measurement = 'http';
 
     ql.addGroup('spdy');
-    ql.addCalculate('mean', 'use');
+    ql.addFunction('mean', 'use');
     assert.equal(ql.toSelect(), 'select mean("use") from "http" group by "spdy"');
 
     ql.addGroup('status', 'time(6h)');
@@ -249,7 +333,7 @@ describe('influxdb-ql', () => {
     const ql = new QL();
     ql.measurement = 'http';
 
-    ql.addCalculate('mean', 'use');
+    ql.addFunction('mean', 'use');
     ql.addGroup('spdy');
     ql.fill = 100;
     assert.equal(ql.toSelect(), 'select mean("use") from "http" group by "spdy" fill(100)');
@@ -262,7 +346,7 @@ describe('influxdb-ql', () => {
     ql.into = 'http copy';
     assert.equal(ql.toSelect(), 'select * into "http copy" from "http"');
 
-    ql.addCalculate('mean', 'use');
+    ql.addFunction('mean', 'use');
     ql.condition('spdy', 'slow');
     ql.start = '2015-08-18T00:00:00Z';
     ql.end = '2015-08-18T00:30:00Z';
@@ -319,7 +403,7 @@ describe('influxdb-ql', () => {
     ql.cqEvery = '2m';
     ql.cqFor = '1m';
 
-    ql.addCalculate('count', 'use');
+    ql.addFunction('count', 'use');
     ql.addGroup('time(5m)');
 
     assert.equal(ql.toCQ(), 'create continuous query "combine-http" on "mydb" resample every 2m for 1m begin select count("use") into "mydb".."http copy" from "mydb".."http" group by time(5m) end');

@@ -1,7 +1,5 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23,20 +21,6 @@ function getParam(args, is, defaultValue) {
     result = defaultValue;
   }
   return result;
-}
-
-function validate(data, keys) {
-  var notSetKeys = [];
-  keys.forEach(function (key) {
-    /* istanbul ignore if */
-    if (!data[key]) {
-      notSetKeys.push(key);
-    }
-  });
-  /* istanbul ignore if */
-  if (notSetKeys.length) {
-    throw new Error(notSetKeys.join(',') + ' can not be null');
-  }
 }
 
 function getTimeCondition(time, type) {
@@ -118,17 +102,76 @@ function convertMeasurement(measurement) {
   return '"' + measurement + '"';
 }
 
+function getRelation(args, defaultValue) {
+  var result = '';
+  args.forEach(function (arg) {
+    if (!util.isString(arg)) {
+      return;
+    }
+    var lowArg = arg.toLowerCase();
+    if (lowArg === 'and' || lowArg === 'or') {
+      result = lowArg;
+    }
+  });
+  return result || defaultValue || 'and';
+}
+
+function getOperator(args, defaultValue) {
+  var result = '';
+  args.forEach(function (arg) {
+    if (!util.isString(arg)) {
+      return;
+    }
+    var lowArg = arg.toLowerCase();
+    if (lowArg !== 'and' && lowArg !== 'or') {
+      result = lowArg;
+    }
+  });
+  return result || defaultValue || '=';
+}
+
+function getConditions(data, operator, relation) {
+  if (util.isString(data)) {
+    var reg = /\sand\s|\sor\s/i;
+    if (reg.test(data)) {
+      return '(' + data + ')';
+    }
+    return data;
+  }
+  var keys = Object.keys(data);
+  var arr = keys.map(function (k) {
+    var key = convertConditionKey(k);
+    var v = data[k];
+    if (util.isArray(v)) {
+      var tmpArr = v.map(function (tmp) {
+        return key + ' ' + operator + ' ' + convertConditionValue(tmp);
+      });
+      return '(' + tmpArr.join(' or ') + ')';
+    }
+    var value = convertConditionValue(v);
+    return key + ' ' + operator + ' ' + value;
+  });
+  if (arr.length > 1) {
+    var joinKey = ' ' + relation + ' ';
+    return '(' + arr.join(joinKey) + ')';
+  }
+  return arr.join('');
+}
+
 function getFrom(data) {
   var arr = [];
   if (data.db) {
     arr.push('"' + data.db + '"');
     if (data.rp) {
       arr.push('"' + data.rp + '"');
-    } else {
-      arr.push('');
     }
   }
-  arr.push(convertMeasurement(data.measurement));
+  if (data.measurement) {
+    if (!data.rp && data.db) {
+      arr.push('');
+    }
+    arr.push(convertMeasurement(data.measurement));
+  }
   return 'from ' + arr.join('.');
 }
 
@@ -147,7 +190,6 @@ function getInto(data) {
 }
 
 function getQL(data) {
-  validate(data, ['measurement']);
   var arr = [];
   arr.push(getFrom(data));
 
@@ -161,7 +203,8 @@ function getQL(data) {
   }
 
   if (conditions.length) {
-    arr.push('where ' + conditions.sort().join(' and '));
+    var joinKey = ' ' + data.relation + ' ';
+    arr.push('where ' + conditions.sort().join(joinKey));
   }
 
   if (groups && groups.length) {
@@ -203,6 +246,27 @@ function showKeys(type, measurement) {
   return ql;
 }
 
+/**
+ * Influx QL
+ *
+ * @example
+ * const QL = require('influx-ql');
+ * const ql = new QL('mydb');
+ * ql.measurement = 'http';
+ * ql.RP = 'two-weeks';
+ * ql.addField('status', 'spdy', 'fetch time');
+ * ql.start = '2016-01-01';
+ * ql.end = '-3h';
+ * ql.limit = 10;
+ * ql.order = 'desc';
+ * ql.offset = 10;
+ * ql.addGroup('spdy');
+ * ql.condition('code', 400);
+ * ql.condition('use', 30, '<=');
+ * ql.fill = 0;
+ * console.info(ql.toSelect());
+ */
+
 var QL = function () {
   function QL(db) {
     _classCallCheck(this, QL);
@@ -210,11 +274,12 @@ var QL = function () {
     var data = internal(this);
     data.fields = [];
     data.conditions = [];
-    data.calculations = [];
+    data.functions = [];
     data.groups = [];
     data.rp = '';
     data.intoRP = '';
     data.db = db;
+    data.relation = 'and';
   }
 
   _createClass(QL, [{
@@ -222,11 +287,37 @@ var QL = function () {
 
     // CQ END
 
+    /**
+     * Add the field of the query result
+     * @param  {String} field - field's name
+     * @return QL
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addField('status', 'spdy', 'fetch time');
+     * console.info(ql.toSelect());
+     * // => select "fetch time","spdy","status" from "mydb".."http"
+     */
     value: function addField() {
       var args = Array.from(arguments);
       addToArray(internal(this).fields, args);
       return this;
     }
+    /**
+     * Remove the field of the query result
+     * @param  {String} field - field's name
+     * @return QL
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addField('status', 'spdy', 'fetch time');
+     * ql.removeField('status');
+     * console.info(ql.toSelect());
+     * // => select "fetch time","spdy" from "mydb".."http"
+     */
+
   }, {
     key: 'removeField',
     value: function removeField() {
@@ -234,107 +325,195 @@ var QL = function () {
       data.fields = removeFromArray(data.fields, Array.from(arguments));
       return this;
     }
+
+    /**
+     * Remove all fields of the query result
+     * @return QL
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addField('status', 'spdy', 'fetch time');
+     * ql.emptyFields();
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http"
+     */
+
   }, {
-    key: 'removeAllField',
-    value: function removeAllField() {
+    key: 'emptyFields',
+    value: function emptyFields() {
       var data = internal(this);
       data.fields.length = 0;
       return this;
     }
+
+    /**
+     * Add the influx ql where condition
+     * @param  {String} key   - the condition key
+     * @param  {String} value - the condition value
+     * @param  {String} relation - the multi condition relation
+     * @param  {String} operator - the conditon operator, default is '='
+     * @return {QL}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL();
+     * ql.measurement = 'http';
+     * ql.condition({
+     *   code: 500,
+     *   spdy: '1',
+     * });
+     * console.info(ql.toSelect());
+     * // => select * from "http" where ("code" = 500 and "spdy" = '1')
+     * @example
+     * const ql = new QL();
+     * ql.measurement = 'http';
+     * ql.condition('spdy', ['1', '2']);
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" where ("spdy" = '1' or "spdy" = '2')
+     * @example
+     * const ql = new QL();
+     * ql.measurement = 'http';
+     * ql.condition({
+     *   code: 500,
+     *   spdy: '1',
+     * }, '!=');
+     * console.info(ql.toSelect());
+     * // => select * from "http" where ("code" != 500 and "spdy" != '1')
+     */
+
   }, {
-    key: 'addCondition',
-    value: function addCondition() {
-      addToArray(internal(this).conditions, Array.from(arguments));
+    key: 'condition',
+    value: function condition(key, value, rlt, op) {
+      var data = key;
+      var args = [rlt, op];
+      if (util.isObject(key)) {
+        args = [value, rlt];
+      } else if (value) {
+        data = {};
+        data[key] = value;
+      }
+
+      var relation = getRelation(args);
+      var operator = getOperator(args);
+
+      var condition = getConditions(data, operator, relation);
+      addToArray(internal(this).conditions, [condition]);
       return this;
     }
+
+    /**
+     * Empty the influx ql where condition
+     * @return {QL}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL();
+     * ql.measurement = 'http';
+     * ql.condition({
+     *   code: 500,
+     *   spyd: '1',
+     * });
+     * console.info(ql.toSelect());
+     * // => select * from "http" where ("code" = 500 and "spdy" = '1')
+     * ql.emptyConditions();
+     * console.info(ql.toSelect());
+     * // => select * from "http"
+     */
+
   }, {
-    key: 'removeCondition',
-    value: function removeCondition() {
-      var data = internal(this);
-      data.conditions = removeFromArray(data.conditions, Array.from(arguments));
-      return this;
-    }
-  }, {
-    key: 'removeAllCondition',
-    value: function removeAllCondition() {
+    key: 'emptyConditions',
+    value: function emptyConditions() {
       internal(this).conditions.length = 0;
       return this;
     }
-  }, {
-    key: 'condition',
-    value: function condition(k, v, op) {
-      var _this = this;
 
-      var operator = op || '=';
-      if (util.isObject(k)) {
-        var _ret = function () {
-          var target = k;
-          var keys = Object.keys(target);
-          keys.forEach(function (key) {
-            return _this.condition(key, target[key]);
-          });
-          return {
-            v: _this
-          };
-        }();
+    /**
+     * Add influx ql function
+     * @param {String} type  - function name
+     * @param {Any} field - function param
+     * @return {QL}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addFunction('count', 'use');
+     * ql.addFunction('mean', 'use');
+     * ql.addGroup('spdy');
+     * console.info(ql.toSelect());
+     * // => select count("use"),mean("use") from "mydb".."http" group by "spdy"
+     */
 
-        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-      }
-      if (k && v) {
-        (function () {
-          var key = convertConditionKey(k);
-          if (util.isArray(v)) {
-            (function () {
-              var arr = [];
-              v.forEach(function (_v) {
-                var tmp = convertConditionValue(_v);
-                arr.push(key + ' ' + operator + ' ' + tmp);
-              });
-              _this.addCondition('(' + arr.join(' or ') + ')');
-            })();
-          } else {
-            var tmp = convertConditionValue(v);
-            _this.addCondition(key + ' ' + operator + ' ' + tmp);
-          }
-        })();
-      } else if (k) {
-        this.addCondition(k);
-      }
-      return this;
-    }
   }, {
-    key: 'tag',
-    value: function tag(k, v) {
-      return this.condition(k, v);
-    }
-  }, {
-    key: 'field',
-    value: function field(k, v) {
-      return this.condition(k, v);
-    }
-  }, {
-    key: 'addCalculate',
-    value: function addCalculate(type, field) {
+    key: 'addFunction',
+    value: function addFunction(type, field) {
       if (type && field) {
-        internal(this).calculations.push(type + '(' + convertField(field) + ')');
+        internal(this).functions.push(type + '(' + convertField(field) + ')');
       }
       return this;
     }
+
+    /**
+     * Remove influx ql function
+     * @param {String} type  - function name
+     * @param {Any} field - function param
+     * @return {QL}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addFunction('count', 'use');
+     * ql.addFunction('mean', 'use');
+     * ql.removeFunction('count', 'use');
+     * ql.addGroup('spdy');
+     * console.info(ql.toSelect());
+     * // => select mean("use") from "mydb".."http" group by "spdy"
+     */
+
   }, {
-    key: 'removeCalculate',
-    value: function removeCalculate(type, field) {
+    key: 'removeFunction',
+    value: function removeFunction(type, field) {
       if (type && field) {
         var data = internal(this);
-        data.calculations = removeFromArray(data.calculations, type + '(' + convertField(field) + ')');
+        data.functions = removeFromArray(data.functions, type + '(' + convertField(field) + ')');
       }
       return this;
     }
+
+    /**
+     * Remove all influx ql functions
+     * @return {QL}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addFunction('count', 'use');
+     * ql.addFunction('mean', 'use');
+     * ql.emptyFunctions();
+     * ql.addGroup('spdy');
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" group by "spdy"
+     */
+
   }, {
-    key: 'removeAllCalculate',
-    value: function removeAllCalculate() {
-      internal(this).calculations.length = 0;
+    key: 'emptyFunctions',
+    value: function emptyFunctions() {
+      internal(this).functions.length = 0;
       return this;
     }
+
+    /**
+     * Add influx ql group by
+     * @param {String} tag - tag's name
+     * @return {QL}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addGroup('spdy', 'method');
+     * ql.addFunction('count', 'use');
+     * console.info(ql.toSelect());
+     * // => select count("use") from "mydb".."http" group by "method","spdy"
+     */
+
   }, {
     key: 'addGroup',
     value: function addGroup() {
@@ -342,6 +521,22 @@ var QL = function () {
       addToArray(internal(this).groups, args);
       return this;
     }
+
+    /**
+     * Remove influx ql group by
+     * @param {String} tag - tag's name
+     * @return {QL}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addGroup('spdy', 'method');
+     * ql.removeGroup('spdy')
+     * ql.addFunction('count', 'use');
+     * console.info(ql.toSelect());
+     * // => select count("use") from "mydb".."http" group by "method"
+     */
+
   }, {
     key: 'removeGroup',
     value: function removeGroup() {
@@ -350,23 +545,59 @@ var QL = function () {
       data.groups = removeFromArray(data.groups, args);
       return this;
     }
+
+    /**
+     * Empty influx ql group by
+     * @return {QL}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addGroup('spdy', 'method');
+     * ql.emptyGroups();
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http"
+     */
+
   }, {
-    key: 'removeAllGroup',
-    value: function removeAllGroup() {
+    key: 'emptyGroups',
+    value: function emptyGroups() {
       var data = internal(this);
       data.groups.length = 0;
       return this;
     }
+
+    /**
+     * Get the influx select ql
+     * @return {String}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.RP = 'two-weeks';
+     * ql.addField('status', 'spdy', 'fetch time');
+     * ql.start = '2016-01-01';
+     * ql.end = '-3h';
+     * ql.limit = 10;
+     * ql.order = 'desc';
+     * ql.offset = 10;
+     * ql.addGroup('spdy');
+     * ql.condition('code', 400);
+     * ql.condition('use', 30, '<=');
+     * ql.fill = 0;
+     * console.info(ql.toSelect());
+     */
+
   }, {
     key: 'toSelect',
     value: function toSelect() {
       var data = internal(this);
       var arr = ['select'];
       var fields = data.fields;
-      var calculations = data.calculations;
+      var functions = data.functions;
 
-      if (calculations && calculations.length) {
-        arr.push(calculations.sort().join(','));
+      if (functions && functions.length) {
+        arr.push(functions.sort().join(','));
       } else if (fields && fields.length) {
         arr.push(fields.sort().map(convertField).join(','));
       } else {
@@ -419,12 +650,35 @@ var QL = function () {
     get: function get() {
       return internal(this).intoDB;
     }
+
+    /**
+     * Set influx ql retention policy
+     * @param {String} rp - The reten retention policy
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.RP = 'two-weeks';
+     * console.info(ql.toSelect());
+     * // => select * from "mydb"."two-weeks"."http"
+     */
+
   }, {
     key: 'RP',
-    set: function set(v) {
-      internal(this).rp = v;
-      return this;
-    },
+    set: function set(rp) {
+      internal(this).rp = rp;
+    }
+    /**
+     * Get influx ql retention policy
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.RP = 'two-weeks';
+     * console.info(ql.RP);
+     * // => two-weeks
+     */
+    ,
     get: function get() {
       return internal(this).rp;
     }
@@ -437,57 +691,200 @@ var QL = function () {
     get: function get() {
       return internal(this).intoRP;
     }
+
+    /**
+     * Set influx ql measurement
+     * @param  {String} measurement - The measurement's name
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http"
+     */
+
   }, {
     key: 'measurement',
-    set: function set(v) {
-      internal(this).measurement = v;
-      return this;
-    },
+    set: function set(measurement) {
+      internal(this).measurement = measurement;
+    }
+
+    /**
+     * Get influx ql measurement
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * console.info(ql.measurement);
+     * // => 'http'
+     */
+    ,
     get: function get() {
       return internal(this).measurement;
     }
+
+    /**
+     * Set influx ql start time
+     * @param  {String} start - start time
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.start = '-3h';
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" where time >= now() - 3h
+     */
+
   }, {
     key: 'start',
-    set: function set(v) {
-      internal(this).start = v;
-      return this;
-    },
+    set: function set(start) {
+      internal(this).start = start;
+    }
+
+    /**
+     * Get influx ql start time
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.start = '-3h';
+     * console.info(ql.start);
+     * // => '-3h';
+     */
+    ,
     get: function get() {
       return internal(this).start;
     }
+
+    /**
+     * Set influx ql end time
+     * @param  {String} end - end time
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.end = '-1h';
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" where time <= now() - 1h
+     */
+
   }, {
     key: 'end',
     set: function set(v) {
       internal(this).end = v;
-      return this;
-    },
+    }
+
+    /**
+     * Get influx ql end time
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.end = '-1h';
+     * console.info(ql.end);
+     * // => '-1h';
+     */
+    ,
     get: function get() {
       return internal(this).end;
     }
+
+    /**
+     * Set influx ql query result point limit
+     * @param  {Integer} limit - the result point limit
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.limit = 10;
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" limit 10
+     */
+
   }, {
     key: 'limit',
-    set: function set(v) {
-      internal(this).limit = v;
-      return this;
-    },
+    set: function set(limit) {
+      internal(this).limit = limit;
+    }
+
+    /**
+     * Get influx ql query result point limit
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.limit = 10;
+     * console.info(ql.limit);
+     * // => 10
+     */
+    ,
     get: function get() {
       return internal(this).limit;
     }
+
+    /**
+     * Set influx query result series limit
+     * @param  {Integer} slimit - the result series limit
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.slimit = 3;
+     * console.info(ql.toSelect());
+     * // => select * from "mydb" slimit 3
+     */
+
   }, {
     key: 'slimit',
-    set: function set(v) {
-      internal(this).slimit = v;
+    set: function set(slimit) {
+      internal(this).slimit = slimit;
       return this;
-    },
+    }
+
+    /**
+     * Get influx query result series limit
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.slimit = 3;
+     * console.info(ql.slimit);
+     * // => 3
+     */
+    ,
     get: function get() {
       return internal(this).slimit;
     }
+
+    /**
+     * Set the influx query result fill value for time intervals that have no data
+     * @param  {String | Number} fill - fill value, special value: linear none null previous.
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addGroup('spdy');
+     * ql.fill = 0;
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" group by "spdy" fill(0)
+     */
+
   }, {
     key: 'fill',
-    set: function set(v) {
-      internal(this).fill = v;
-      return this;
-    },
+    set: function set(fill) {
+      internal(this).fill = fill;
+    }
+
+    /**
+     * Get the influx query result fill value for time intervals that have no data
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addGroup('spdy');
+     * ql.fill = 0;
+     * console.info(ql.fill);
+     * // => 0
+     */
+    ,
     get: function get() {
       return internal(this).fill;
     }
@@ -500,32 +897,144 @@ var QL = function () {
     get: function get() {
       return internal(this).into;
     }
+
+    /**
+     * Set the influx query result order of time
+     * @param  {String} order - 'desc' or 'asc'
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addGroup('spdy');
+     * ql.order = 'desc';
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" group by "spdy" order by time desc
+     */
+
   }, {
     key: 'order',
-    set: function set(v) {
-      internal(this).order = v;
-      return this;
-    },
+    set: function set(order) {
+      internal(this).order = order;
+    }
+
+    /**
+     * Get the influx query result order of time
+     * @param  {String} order - 'desc' or 'asc'
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addGroup('spdy');
+     * console.info(ql.order);
+     * // => undefined
+     * ql.order = 'desc';
+     * // => 'desc'
+     */
+    ,
     get: function get() {
       return internal(this).order;
     }
+
+    /**
+     * Set influx ql query offset of the result
+     * @param  {Integer} offset - offset value
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.offset = 10;
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" offset 10
+     */
+
   }, {
     key: 'offset',
     set: function set(v) {
       internal(this).offset = v;
-      return this;
-    },
-    get: function get() {
-      return internal(this).offset;
     }
+
+    /**
+     * Get influx ql query offset of the result
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * console.info(ql.offset);
+     * // => 0
+     * ql.offset = 10;
+     * console.info(ql.offset);
+     * // => 10
+     */
+    ,
+    get: function get() {
+      return internal(this).offset || 0;
+    }
+
+    /**
+     * Set influx ql offset series in the query results
+     * @param  {Integer} soffset - soffset value
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.soffset = 10;
+     * console.info(ql.toSelect());
+     * // => select * from "mydb" soffset 10
+     */
+
   }, {
     key: 'soffset',
-    set: function set(v) {
-      internal(this).soffset = v;
-      return this;
-    },
+    set: function set(soffset) {
+      internal(this).soffset = soffset;
+    }
+
+    /**
+     * Get influx ql offset series in the query results
+     * @return {Integer}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * console.info(ql.soffset);
+     * // => 0
+     * ql.soffset = 10;
+     * console.info(ql.soffset);
+     * // => 10
+     */
+    ,
     get: function get() {
-      return internal(this).soffset;
+      return internal(this).soffset || 0;
+    }
+
+    /**
+     * Get influx ql default where relation
+     * @return {String}
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * console.info(ql.relation);
+     * // => 'and'
+     */
+
+  }, {
+    key: 'relation',
+    get: function get() {
+      return internal(this).relation;
+    }
+
+    /**
+     * Set influx ql default where relation
+     * @param  {String} relation - the default relation
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * console.info(ql.relation);
+     * // => and
+     * ql.relation = 'or';
+     * console.info(ql.relation);
+     * // => or
+     */
+    ,
+    set: function set(relation) {
+      internal(this).relation = relation;
     }
 
     // CQ BEGIN
@@ -639,7 +1148,7 @@ var QL = function () {
   }, {
     key: 'updateRP',
     value: function updateRP(name, database, duration, replication, shardDuration, isDefault) {
-      if (!name || !database || !duration) {
+      if (!name || !database) {
         throw new Error('name and database can not be null');
       }
       var args = [replication, shardDuration, isDefault];
