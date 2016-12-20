@@ -60,15 +60,10 @@ function convert(field) {
   return field;
 }
 
-function convertField(field) {
-  // field + x
-  if (field.indexOf('+') !== -1) {
-    return field;
+function convertKey(key) {
+  if (!util.isString(key)) {
+    return key;
   }
-  return '"' + field + '"';
-}
-
-function convertConditionKey(key) {
   // key + x
   if (key.indexOf('+') !== -1) {
     return key;
@@ -140,7 +135,7 @@ function getConditions(data, operator, relation) {
   }
   var keys = Object.keys(data);
   var arr = keys.map(function (k) {
-    var key = convertConditionKey(k);
+    var key = convertKey(k);
     var v = data[k];
     if (util.isArray(v)) {
       var tmpArr = v.map(function (tmp) {
@@ -430,6 +425,7 @@ var QL = function () {
      * Add influx ql function
      * @param {String} type  - function name
      * @param {Any} field - function param
+     * @param {Any} field - function param
      * @return {QL}
      * @since 2.0.0
      * @example
@@ -440,13 +436,22 @@ var QL = function () {
      * ql.addGroup('spdy');
      * console.info(ql.toSelect());
      * // => select count("use"),mean("use") from "mydb".."http" group by "spdy"
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addFunction("bottom", 'use', 3);
+     * console.info(ql.toSelect());
+     * // => select bottom("use",3) from "mydb".."http"
      */
 
   }, {
     key: 'addFunction',
-    value: function addFunction(type, field) {
-      if (type && field) {
-        internal(this).functions.push(type + '(' + convertField(field) + ')');
+    value: function addFunction() {
+      var args = Array.from(arguments);
+      if (args.length >= 2) {
+        var type = args.shift();
+        var arr = args.map(convertKey);
+        internal(this).functions.push(type + '(' + arr.join(',') + ')');
       }
       return this;
     }
@@ -473,7 +478,7 @@ var QL = function () {
     value: function removeFunction(type, field) {
       if (type && field) {
         var data = internal(this);
-        data.functions = removeFromArray(data.functions, type + '(' + convertField(field) + ')');
+        data.functions = removeFromArray(data.functions, type + '(' + convertKey(field) + ')');
       }
       return this;
     }
@@ -599,7 +604,7 @@ var QL = function () {
       if (functions && functions.length) {
         arr.push(functions.sort().join(','));
       } else if (fields && fields.length) {
-        arr.push(fields.sort().map(convertField).join(','));
+        arr.push(fields.sort().map(convertKey).join(','));
       } else {
         arr.push('*');
       }
