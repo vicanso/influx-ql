@@ -437,6 +437,7 @@ var QL = function () {
      * console.info(ql.toSelect());
      * // => select count("use"),mean("use") from "mydb".."http" group by "spdy"
      * @example
+     * // version 2.0.1
      * const ql = new QL('mydb');
      * ql.measurement = 'http';
      * ql.addFunction("bottom", 'use', 3);
