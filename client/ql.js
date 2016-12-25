@@ -72,7 +72,7 @@ function convertKey(key) {
 }
 
 function isRegExp(value) {
-  return value.charAt(0) === '/' && value.charAt(value.length - 1) === '/';
+  return value.length > 2 && value.charAt(0) === '/' && value.charAt(value.length - 1) === '/';
 }
 
 function convertConditionValue(value) {

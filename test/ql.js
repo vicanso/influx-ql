@@ -114,6 +114,13 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = /GET/ and "spdy" = /1|2/');
   });
 
+  it('condition({path: "/"}', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.condition({path: '/'});
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "path" = \'/\'');
+  });
+
   it('call condition twice', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
