@@ -156,6 +156,13 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select bottom("use",3) from "mydb".."http"');
   });
 
+  it('addFunction, single param', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addFunction('bottom("use",3)');
+    assert.equal(ql.toSelect(), 'select bottom("use",3) from "mydb".."http"');
+  });
+
   it('removeFunction', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';

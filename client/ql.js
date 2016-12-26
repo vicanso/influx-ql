@@ -443,16 +443,26 @@ var QL = function () {
      * ql.addFunction("bottom", 'use', 3);
      * console.info(ql.toSelect());
      * // => select bottom("use",3) from "mydb".."http"
+     * * @example
+     * // version 2.0.3
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addFunction('count("use")');
+     * console.info(ql.toSelect());
+     * // => select count("use") from "mydb".."http"
      */
 
   }, {
     key: 'addFunction',
     value: function addFunction() {
       var args = Array.from(arguments);
+      var functions = internal(this).functions;
       if (args.length >= 2) {
         var type = args.shift();
         var arr = args.map(convertKey);
-        internal(this).functions.push(type + '(' + arr.join(',') + ')');
+        functions.push(type + '(' + arr.join(',') + ')');
+      } else {
+        functions.push(args[0]);
       }
       return this;
     }
