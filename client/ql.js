@@ -611,11 +611,19 @@ var QL = function () {
       var arr = ['select'];
       var fields = data.fields;
       var functions = data.functions;
-
+      var selectFields = [];
       if (functions && functions.length) {
-        arr.push(functions.sort().join(','));
-      } else if (fields && fields.length) {
-        arr.push(fields.sort().map(convertKey).join(','));
+        functions.sort().forEach(function (item) {
+          return selectFields.push(item);
+        });
+      }
+      if (fields && fields.length) {
+        fields.sort().map(convertKey).forEach(function (item) {
+          return selectFields.push(item);
+        });
+      }
+      if (selectFields.length) {
+        arr.push(selectFields.join(','));
       } else {
         arr.push('*');
       }
