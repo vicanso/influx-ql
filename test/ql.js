@@ -25,6 +25,25 @@ describe('influxdb-ql', () => {
     });
   });
 
+  it('basic query', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.RP = 'default';
+    ql.addField('status', 'spdy', 'fetch time');
+    ql.addGroup('spdy');
+    ql.start = '2016-01-01';
+    ql.end = '-3h';
+    ql.limit = 10;
+    ql.slimit = 5;
+    ql.order = 'desc';
+    ql.offset = 10;
+    ql.soffset = 5;
+    ql.condition('code', 400);
+    ql.condition('"use" <= 30');
+    ql.fill = 0;
+    assert.equal(ql.toSelect(), 'select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= \'2016-01-01\' group by "spdy" fill(0) order by time desc limit 10 slimit 5 offset 10 soffset 5');
+  });
+
   it('addField', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';

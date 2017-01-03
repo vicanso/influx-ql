@@ -25,7 +25,6 @@ ql.offset = 10;
 ql.soffset = 5;
 ql.condition('code', 400);
 ql.condition('"use" <= 30');
-ql.fill = 0;
 // select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= '2016-01-01' order by time desc limit 10 slimit 5 offset 10 soffset 5
 ql.toSelect();
 ```
