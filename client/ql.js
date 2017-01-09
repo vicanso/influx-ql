@@ -275,6 +275,7 @@ var QL = function () {
     data.intoRP = '';
     data.db = db;
     data.relation = 'and';
+    this.condition = this.where;
   }
 
   _createClass(QL, [{
@@ -343,7 +344,7 @@ var QL = function () {
     }
 
     /**
-     * Add the influx ql where condition
+     * Add the influx ql where condition, alias for condition
      * @param  {String} key   - the condition key
      * @param  {String} value - the condition value
      * @param  {String} relation - the multi condition relation
@@ -353,7 +354,7 @@ var QL = function () {
      * @example
      * const ql = new QL();
      * ql.measurement = 'http';
-     * ql.condition({
+     * ql.where({
      *   code: 500,
      *   spdy: '1',
      * });
@@ -362,13 +363,13 @@ var QL = function () {
      * @example
      * const ql = new QL();
      * ql.measurement = 'http';
-     * ql.condition('spdy', ['1', '2']);
+     * ql.where('spdy', ['1', '2']);
      * console.info(ql.toSelect());
      * // => select * from "mydb".."http" where ("spdy" = '1' or "spdy" = '2')
      * @example
      * const ql = new QL();
      * ql.measurement = 'http';
-     * ql.condition({
+     * ql.where({
      *   code: 500,
      *   spdy: '1',
      * }, '!=');
@@ -377,8 +378,8 @@ var QL = function () {
      */
 
   }, {
-    key: 'condition',
-    value: function condition(key, value, rlt, op) {
+    key: 'where',
+    value: function where(key, value, rlt, op) {
       var data = key;
       var args = [rlt, op];
       if (util.isObject(key)) {
