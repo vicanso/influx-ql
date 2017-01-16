@@ -187,7 +187,7 @@ describe('influxdb-ql', () => {
     ql.measurement = 'http';
     ql.addFunction('bottom("use",3)');
     ql.addField('spdy');
-    assert.equal(ql.toSelect(), 'select bottom("use",3),"spdy" from "mydb".."http"');
+    assert.equal(ql.toSelect(), 'select "spdy",bottom("use",3) from "mydb".."http"');
   });
 
   it('removeFunction', () => {
