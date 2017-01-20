@@ -2,22 +2,48 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var internal = require('./internal');
-var util = require('util');
+
+function isUndefined(value) {
+  return value === undefined;
+}
+
+function isString(value) {
+  return typeof value === 'string';
+}
+
+function isNil(value) {
+  return value == null;
+}
+
+function isObject(value) {
+  var type = typeof value === 'undefined' ? 'undefined' : _typeof(value);
+  return value != null && (type === 'object' || type === 'function');
+}
+
+function isBoolean(value) {
+  return value === true || value === false;
+}
+
+function isNumber(value) {
+  return typeof value === 'number';
+}
 
 function getParam(args, is, defaultValue) {
   var result = void 0;
   args.forEach(function (v) {
-    if (!util.isUndefined(result)) {
+    if (!isUndefined(result)) {
       return;
     }
     if (is(v)) {
       result = v;
     }
   });
-  if (util.isUndefined(result)) {
+  if (isUndefined(result)) {
     result = defaultValue;
   }
   return result;
@@ -61,7 +87,7 @@ function convert(field) {
 }
 
 function convertKey(key) {
-  if (!util.isString(key)) {
+  if (!isString(key)) {
     return key;
   }
   // key + x
@@ -76,7 +102,7 @@ function isRegExp(value) {
 }
 
 function convertConditionValue(value) {
-  if (util.isString(value) && !isRegExp(value)) {
+  if (isString(value) && !isRegExp(value)) {
     return '\'' + value + '\'';
   }
   return value;
@@ -100,7 +126,7 @@ function convertMeasurement(measurement) {
 function getRelation(args, defaultValue) {
   var result = '';
   args.forEach(function (arg) {
-    if (!util.isString(arg)) {
+    if (!isString(arg)) {
       return;
     }
     var lowArg = arg.toLowerCase();
@@ -114,7 +140,7 @@ function getRelation(args, defaultValue) {
 function getOperator(args, defaultValue) {
   var result = '';
   args.forEach(function (arg) {
-    if (!util.isString(arg)) {
+    if (!isString(arg)) {
       return;
     }
     var lowArg = arg.toLowerCase();
@@ -126,7 +152,7 @@ function getOperator(args, defaultValue) {
 }
 
 function getConditions(data, operator, relation) {
-  if (util.isString(data)) {
+  if (isString(data)) {
     var reg = /\sand\s|\sor\s/i;
     if (reg.test(data)) {
       return '(' + data + ')';
@@ -137,7 +163,7 @@ function getConditions(data, operator, relation) {
   var arr = keys.map(function (k) {
     var key = convertKey(k);
     var v = data[k];
-    if (util.isArray(v)) {
+    if (Array.isArray(v)) {
       var tmpArr = v.map(function (tmp) {
         return key + ' ' + operator + ' ' + convertConditionValue(tmp);
       });
@@ -205,7 +231,7 @@ function getQL(data) {
   if (groups && groups.length) {
     arr.push('group by ' + groups.sort().map(convertGroupValue).join(','));
 
-    if (!util.isNullOrUndefined(data.fill)) {
+    if (!isNil(data.fill)) {
       arr.push('fill(' + data.fill + ')');
     }
   }
@@ -382,7 +408,7 @@ var QL = function () {
     value: function where(key, value, rlt, op) {
       var data = key;
       var args = [rlt, op];
-      if (util.isObject(key)) {
+      if (isObject(key)) {
         args = [value, rlt];
       } else if (value) {
         data = {};
@@ -614,17 +640,17 @@ var QL = function () {
       var functions = data.functions;
       var selectFields = [];
       if (functions && functions.length) {
-        functions.sort().forEach(function (item) {
+        functions.forEach(function (item) {
           return selectFields.push(item);
         });
       }
       if (fields && fields.length) {
-        fields.sort().map(convertKey).forEach(function (item) {
+        fields.map(convertKey).forEach(function (item) {
           return selectFields.push(item);
         });
       }
       if (selectFields.length) {
-        arr.push(selectFields.join(','));
+        arr.push(selectFields.sort().join(','));
       } else {
         arr.push('*');
       }
@@ -1147,9 +1173,9 @@ var QL = function () {
         throw new Error('name, database and duration can not be null');
       }
       var args = [replication, shardDuration, isDefault];
-      var defaultValue = getParam(args, util.isBoolean);
-      var rpl = getParam(args, util.isNumber, 1);
-      var shdDuration = getParam(args, util.isString);
+      var defaultValue = getParam(args, isBoolean);
+      var rpl = getParam(args, isNumber, 1);
+      var shdDuration = getParam(args, isString);
       var arr = ['create retention policy "' + name + '" on "' + database + '"'];
       if (duration) {
         arr.push('duration ' + duration);
@@ -1177,9 +1203,9 @@ var QL = function () {
         throw new Error('name and database can not be null');
       }
       var args = [replication, shardDuration, isDefault];
-      var defaultValue = getParam(args, util.isBoolean);
-      var rpl = getParam(args, util.isNumber);
-      var shdDuration = getParam(args, util.isString);
+      var defaultValue = getParam(args, isBoolean);
+      var rpl = getParam(args, isNumber);
+      var shdDuration = getParam(args, isString);
       var arr = ['alter retention policy "' + name + '" on "' + database + '"'];
       if (duration && duration !== '0') {
         arr.push('duration ' + duration);

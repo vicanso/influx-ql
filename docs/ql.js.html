@@ -40,19 +40,44 @@
             <pre class="prettyprint source linenums"><code>'use strict';
 
 const internal = require('./internal');
-const util = require('util');
+
+function isUndefined(value) {
+  return value === undefined;
+}
+
+function isString(value) {
+  return typeof value === 'string';
+}
+
+function isNil(value) {
+  return value == null;
+}
+
+
+function isObject(value) {
+  const type = typeof value;
+  return value != null &amp;&amp; (type === 'object' || type === 'function');
+}
+
+function isBoolean(value) {
+  return value === true || value === false;
+}
+
+function isNumber(value) {
+  return typeof value === 'number';
+}
 
 function getParam(args, is, defaultValue) {
   let result;
   args.forEach((v) => {
-    if (!util.isUndefined(result)) {
+    if (!isUndefined(result)) {
       return;
     }
     if (is(v)) {
       result = v;
     }
   });
-  if (util.isUndefined(result)) {
+  if (isUndefined(result)) {
     result = defaultValue;
   }
   return result;
@@ -94,7 +119,7 @@ function convert(field) {
 }
 
 function convertKey(key) {
-  if (!util.isString(key)) {
+  if (!isString(key)) {
     return key;
   }
   // key + x
@@ -109,7 +134,7 @@ function isRegExp(value) {
 }
 
 function convertConditionValue(value) {
-  if (util.isString(value) &amp;&amp; !isRegExp(value)) {
+  if (isString(value) &amp;&amp; !isRegExp(value)) {
     return `'${value}'`;
   }
   return value;
@@ -133,7 +158,7 @@ function convertMeasurement(measurement) {
 function getRelation(args, defaultValue) {
   let result = '';
   args.forEach((arg) => {
-    if (!util.isString(arg)) {
+    if (!isString(arg)) {
       return;
     }
     const lowArg = arg.toLowerCase();
@@ -147,7 +172,7 @@ function getRelation(args, defaultValue) {
 function getOperator(args, defaultValue) {
   let result = '';
   args.forEach((arg) => {
-    if (!util.isString(arg)) {
+    if (!isString(arg)) {
       return;
     }
     const lowArg = arg.toLowerCase();
@@ -159,7 +184,7 @@ function getOperator(args, defaultValue) {
 }
 
 function getConditions(data, operator, relation) {
-  if (util.isString(data)) {
+  if (isString(data)) {
     const reg = /\sand\s|\sor\s/i;
     if (reg.test(data)) {
       return `(${data})`;
@@ -170,7 +195,7 @@ function getConditions(data, operator, relation) {
   const arr = keys.map((k) => {
     const key = convertKey(k);
     const v = data[k];
-    if (util.isArray(v)) {
+    if (Array.isArray(v)) {
       const tmpArr = v.map(tmp => `${key} ${operator} ${convertConditionValue(tmp)}`);
       return `(${tmpArr.join(' or ')})`;
     }
@@ -236,7 +261,7 @@ function getQL(data) {
   if (groups &amp;&amp; groups.length) {
     arr.push(`group by ${groups.sort().map(convertGroupValue).join(',')}`);
 
-    if (!util.isNullOrUndefined(data.fill)) {
+    if (!isNil(data.fill)) {
       arr.push(`fill(${data.fill})`);
     }
   }
@@ -785,7 +810,7 @@ class QL {
   where(key, value, rlt, op) {
     let data = key;
     let args = [rlt, op];
-    if (util.isObject(key)) {
+    if (isObject(key)) {
       args = [value, rlt];
     } else if (value) {
       data = {};
@@ -993,13 +1018,13 @@ class QL {
     const functions = data.functions;
     const selectFields = [];
     if (functions &amp;&amp; functions.length) {
-      functions.sort().forEach(item => selectFields.push(item));
+      functions.forEach(item => selectFields.push(item));
     }
     if (fields &amp;&amp; fields.length) {
-      fields.sort().map(convertKey).forEach(item => selectFields.push(item));
+      fields.map(convertKey).forEach(item => selectFields.push(item));
     }
     if (selectFields.length) {
-      arr.push(selectFields.join(','));
+      arr.push(selectFields.sort().join(','));
     } else {
       arr.push('*');
     }
@@ -1077,9 +1102,9 @@ class QL {
       throw new Error('name, database and duration can not be null');
     }
     const args = [replication, shardDuration, isDefault];
-    const defaultValue = getParam(args, util.isBoolean);
-    const rpl = getParam(args, util.isNumber, 1);
-    const shdDuration = getParam(args, util.isString);
+    const defaultValue = getParam(args, isBoolean);
+    const rpl = getParam(args, isNumber, 1);
+    const shdDuration = getParam(args, isString);
     const arr = [`create retention policy "${name}" on "${database}"`];
     if (duration) {
       arr.push(`duration ${duration}`);
@@ -1105,9 +1130,9 @@ class QL {
       throw new Error('name and database can not be null');
     }
     const args = [replication, shardDuration, isDefault];
-    const defaultValue = getParam(args, util.isBoolean);
-    const rpl = getParam(args, util.isNumber);
-    const shdDuration = getParam(args, util.isString);
+    const defaultValue = getParam(args, isBoolean);
+    const rpl = getParam(args, isNumber);
+    const shdDuration = getParam(args, isString);
     const arr = [`alter retention policy "${name}" on "${database}"`];
     if (duration &amp;&amp; duration !== '0') {
       arr.push(`duration ${duration}`);
@@ -1138,7 +1163,7 @@ module.exports = QL;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Jan 09 2017 20:41:41 GMT+0800 (CST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri Jan 20 2017 21:10:11 GMT+0800 (CST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
