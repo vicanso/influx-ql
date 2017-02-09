@@ -1,4 +1,4 @@
-# Influx-ql 
+# Influx-ql
 
 [![Build Status](https://travis-ci.org/vicanso/influx-ql.svg?style=flat-square)](https://travis-ci.org/vicanso/influx-ql)
 [![Coverage Status](https://img.shields.io/coveralls/vicanso/influx-ql/master.svg?style=flat)](https://coveralls.io/r/vicanso/influx-ql?branch=master)
@@ -72,6 +72,14 @@ ql.emptyConditions();
 ql.condition('spdy', '1');
 ql.condition('method', 'GET');
 ql.relation = 'or';
+
+// select sum("max") from (select max("fetch time") from "mydb".."http" group by "spdy")
+ql.clean();
+ql.measurement = 'http';
+ql.addFunction('max', 'fetch time');
+ql.addGroup('spdy');
+ql.subQuery();
+ql.addFunction('sum', 'max');
 ```
 
 ## Installation
@@ -81,8 +89,8 @@ $ npm i influx-ql
 ```
 
 ## Examples
-  
-View the [./examples](examples) directory for working examples. 
+
+View the [./examples](examples) directory for working examples.
 
 ## API
 

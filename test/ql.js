@@ -438,6 +438,25 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from "http" offset 10');
   });
 
+  it('clean', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addField('fetch time');
+    ql.addGroup('spdy');
+    assert.equal(ql.toSelect(), 'select "fetch time" from "mydb".."http" group by "spdy"');
+    ql.clean();
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
+  });
+
+  it('subQuery', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addFunction('max', 'fetch time');
+    ql.addGroup('spdy');
+    ql.subQuery();
+    ql.addFunction('sum', 'max');
+    assert.equal(ql.toSelect(), 'select sum("max") from (select max("fetch time") from "mydb".."http" group by "spdy")');
+  });
 
 
   it('CQ', () => {

@@ -181,17 +181,22 @@ function getConditions(data, operator, relation) {
 
 function getFrom(data) {
   var arr = [];
-  if (data.db) {
-    arr.push('"' + data.db + '"');
-    if (data.rp) {
-      arr.push('"' + data.rp + '"');
+  if (data.subQuery) {
+    arr.push('(' + data.subQuery + ')');
+  } else {
+    if (data.db) {
+      arr.push('"' + data.db + '"');
+      if (data.rp) {
+        arr.push('"' + data.rp + '"');
+      }
     }
-  }
-  if (data.measurement) {
-    if (!data.rp && data.db) {
-      arr.push('');
+    /* istanbul ignore else */
+    if (data.measurement) {
+      if (!data.rp && data.db) {
+        arr.push('');
+      }
+      arr.push(convertMeasurement(data.measurement));
     }
-    arr.push(convertMeasurement(data.measurement));
   }
   return 'from ' + arr.join('.');
 }
@@ -293,15 +298,10 @@ var QL = function () {
     _classCallCheck(this, QL);
 
     var data = internal(this);
-    data.fields = [];
-    data.conditions = [];
-    data.functions = [];
-    data.groups = [];
-    data.rp = '';
-    data.intoRP = '';
     data.db = db;
     data.relation = 'and';
     this.condition = this.where;
+    this.clean();
   }
 
   _createClass(QL, [{
@@ -662,6 +662,56 @@ var QL = function () {
       arr.push(getQL(data));
 
       return arr.join(' ');
+    }
+    /**
+     * Set the sub query string, it will get the current ql for sub query
+     * and clean the query options
+     * @since 2.5.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addFunction('max', 'fetch time');
+     * ql.addGroup('spdy');
+     * ql.subQuery();
+     * ql.addFunction('sum', 'max');
+     * console.info(ql.toSelect());
+     * // => select sum("max") from (select max("fetch time") from "mydb".."http" group by "spdy")
+     */
+
+  }, {
+    key: 'subQuery',
+    value: function subQuery() {
+      var data = internal(this);
+      var subQuery = this.toSelect();
+      this.clean();
+      data.subQuery = subQuery;
+      return this;
+    }
+
+    /**
+     * Clean all the influx ql condition
+     * @since 2.5.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addField('fetch time');
+     * ql.addGroup('spdy');
+     * ql.clean();
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http"
+     */
+
+  }, {
+    key: 'clean',
+    value: function clean() {
+      var data = internal(this);
+      data.fields = [];
+      data.conditions = [];
+      data.functions = [];
+      data.groups = [];
+      data.rp = '';
+      data.intoRP = '';
+      data.subQuery = '';
     }
   }, {
     key: 'toCQ',
