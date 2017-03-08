@@ -51,12 +51,31 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select "fetch time","spdy","status" from "mydb".."http"');
   });
 
+  it('addField use alias', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addField({
+      'fetch time': 'ft',
+    });
+    assert.equal(ql.toSelect(), 'select "fetch time" as "ft" from "mydb".."http"');
+  });
+
   it('removeField', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
     ql.addField('status', 'spdy', 'fetch time');
     ql.removeField('spdy', 'fetch time');
     assert.equal(ql.toSelect(), 'select "status" from "mydb".."http"');
+  });
+
+  it('removeField is use alias', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addField({
+      'fetch time': 'ft',
+    });
+    ql.removeField('fetch time');
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
   });
 
   it('emptyFields', () => {
@@ -190,6 +209,24 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select "spdy",bottom("use",3) from "mydb".."http"');
   });
 
+  it('addFunction and use alias', () => {
+    let ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addFunction('bottom("use",3)', {
+      alias: 'bot3Use',
+    });
+    ql.addField('spdy');
+    assert.equal(ql.toSelect(), 'select "spdy",bottom("use",3) as "bot3Use" from "mydb".."http"');
+
+    ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addFunction('bottom', 'use', 3, {
+      alias: 'bot3Use',
+    });
+    ql.addField('spdy');
+    assert.equal(ql.toSelect(), 'select "spdy",bottom("use",3) as "bot3Use" from "mydb".."http"');
+  });
+
   it('removeFunction', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
@@ -198,6 +235,17 @@ describe('influxdb-ql', () => {
     ql.addFunction('mean', 'use');
     ql.removeFunction('count', 'use');
     assert.equal(ql.toSelect(), 'select mean("use") from "mydb".."http" group by "spdy"');
+  });
+
+  it('removeFunction use alias', () => {
+    let ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addFunction('bottom("use",3)', {
+      alias: 'bot3Use',
+    });
+    ql.addField('spdy');
+    ql.removeFunction('bottom("use",3)');
+    assert.equal(ql.toSelect(), 'select "spdy" from "mydb".."http"');
   });
 
   it('emptyFunctions', () => {
