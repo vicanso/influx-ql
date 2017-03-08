@@ -313,13 +313,21 @@ var QL = function () {
      * Add the field of the query result
      * @param  {String} field - field's name
      * @return QL
-     * @since 2.0.0
+     * @since 2.6.0
      * @example
      * const ql = new QL('mydb');
      * ql.measurement = 'http';
      * ql.addField('status', 'spdy', 'fetch time');
      * console.info(ql.toSelect());
      * // => select "fetch time","spdy","status" from "mydb".."http"
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addField({
+     *   'fetch time': 'ft',
+     * });
+     * console.info(ql.toSelect());
+     * // => select "fetch time" as "ft" from "mydb".."http"
      */
     value: function addField() {
       var args = Array.from(arguments);
@@ -344,7 +352,20 @@ var QL = function () {
     key: 'removeField',
     value: function removeField() {
       var data = internal(this);
-      data.fields = removeFromArray(data.fields, Array.from(arguments));
+      var args = Array.from(arguments);
+      data.fields = data.fields.filter(function (item) {
+        if (isObject(item)) {
+          var keys = Object.keys(item);
+          keys.forEach(function (key) {
+            if (args.indexOf(key) !== -1) {
+              /* eslint no-param-reassign:0 */
+              delete item[key];
+            }
+          });
+          return true;
+        }
+        return args.indexOf(item) === -1;
+      });
       return this;
     }
 
@@ -453,8 +474,9 @@ var QL = function () {
      * @param {String} type  - function name
      * @param {Any} field - function param
      * @param {Any} field - function param
+     * @param {Object} options - set the alias for the function, eg: {"alias": "the alias name"}
      * @return {QL}
-     * @since 2.0.0
+     * @since 2.6.0
      * @example
      * const ql = new QL('mydb');
      * ql.measurement = 'http';
@@ -464,19 +486,33 @@ var QL = function () {
      * console.info(ql.toSelect());
      * // => select count("use"),mean("use") from "mydb".."http" group by "spdy"
      * @example
-     * // version 2.0.1
      * const ql = new QL('mydb');
      * ql.measurement = 'http';
      * ql.addFunction("bottom", 'use', 3);
      * console.info(ql.toSelect());
      * // => select bottom("use",3) from "mydb".."http"
-     * * @example
-     * // version 2.0.3
+     * @example
      * const ql = new QL('mydb');
      * ql.measurement = 'http';
      * ql.addFunction('count("use")');
      * console.info(ql.toSelect());
      * // => select count("use") from "mydb".."http"
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addFunction('count("use")', {
+     *   alias: 'countUse',
+     * });
+     * console.info(ql.toSelect());
+     * // => select count("use") as "countUse" from "mydb".."http"
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addFunction('count', 'use', {
+     *   alias: 'countUse',
+     * });
+     * console.info(ql.toSelect());
+     * // => select count("use") as "countUse" from "mydb".."http"
      */
 
   }, {
@@ -484,12 +520,22 @@ var QL = function () {
     value: function addFunction() {
       var args = Array.from(arguments);
       var functions = internal(this).functions;
+      var alias = null;
+      if (isObject(args[args.length - 1])) {
+        alias = args.pop().alias;
+      }
+      var fnDesc = '';
       if (args.length >= 2) {
         var type = args.shift();
         var arr = args.map(convertKey);
-        functions.push(type + '(' + arr.join(',') + ')');
+        fnDesc = type + '(' + arr.join(',') + ')';
       } else {
-        functions.push(args[0]);
+        fnDesc = args[0];
+      }
+      if (alias) {
+        functions.push(fnDesc + ' as ' + convertKey(alias));
+      } else {
+        functions.push(fnDesc);
       }
       return this;
     }
@@ -498,8 +544,9 @@ var QL = function () {
      * Remove influx ql function
      * @param {String} type  - function name
      * @param {Any} field - function param
+     * @param {Any} field - function param
      * @return {QL}
-     * @since 2.0.0
+     * @since 2.6.0
      * @example
      * const ql = new QL('mydb');
      * ql.measurement = 'http';
@@ -513,11 +560,23 @@ var QL = function () {
 
   }, {
     key: 'removeFunction',
-    value: function removeFunction(type, field) {
-      if (type && field) {
-        var data = internal(this);
-        data.functions = removeFromArray(data.functions, type + '(' + convertKey(field) + ')');
+    value: function removeFunction() {
+      var data = internal(this);
+      var args = Array.from(arguments);
+      var fnDesc = '';
+      if (args.length >= 2) {
+        var type = args.shift();
+        var arr = args.map(convertKey);
+        fnDesc = type + '(' + arr.join(',') + ')';
+      } else {
+        fnDesc = args[0];
       }
+      data.functions = data.functions.filter(function (item) {
+        if (item === fnDesc) {
+          return false;
+        }
+        return item.indexOf(fnDesc + ' as ') === -1;
+      });
       return this;
     }
 
@@ -645,8 +704,20 @@ var QL = function () {
         });
       }
       if (fields && fields.length) {
-        fields.map(convertKey).forEach(function (item) {
-          return selectFields.push(item);
+        var convertField = function convertField(field) {
+          if (isObject(field)) {
+            var tmpArr = [];
+            var keys = Object.keys(field);
+            keys.forEach(function (key) {
+              var v = convertKey(key) + ' as ' + convertKey(field[key]);
+              tmpArr.push(v);
+            });
+            return tmpArr;
+          }
+          return [convertKey(field)];
+        };
+        fields.map(convertField).forEach(function (items) {
+          return selectFields.push.apply(selectFields, items);
         });
       }
       if (selectFields.length) {
