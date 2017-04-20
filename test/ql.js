@@ -38,8 +38,8 @@ describe('influxdb-ql', () => {
     ql.order = 'desc';
     ql.offset = 10;
     ql.soffset = 5;
-    ql.condition('code', 400);
-    ql.condition('"use" <= 30');
+    ql.where('code', 400);
+    ql.where('"use" <= 30');
     ql.fill = 0;
     assert.equal(ql.toSelect(), 'select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= \'2016-01-01\' group by "spdy" fill(0) order by time desc limit 10 slimit 5 offset 10 soffset 5');
   });
@@ -86,91 +86,91 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
   });
 
-  it('condition("spdy", "1")', () => {
+  it('where("spdy", "1")', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition('spdy', '1');
+    ql.where('spdy', '1');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "spdy" = \'1\'');
   });
 
-  it('condition("spdy", ["1", "2"])', () => {
+  it('where("spdy", ["1", "2"])', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition('spdy', ['1', '2']);
+    ql.where('spdy', ['1', '2']);
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" = \'1\' or "spdy" = \'2\')');
   });
 
-  it('condition("use", 300, ">=")', () => {
+  it('where("use", 300, ">=")', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition('use', 300, '>=');
+    ql.where('use', 300, '>=');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "use" >= 300');
   });
 
-  it('condition({spdy: "1", method: "GET"})', () => {
+  it('where({spdy: "1", method: "GET"})', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition({
+    ql.where({
       spdy: '1',
       method: 'GET',
     });
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" = \'1\' and "method" = \'GET\')');
   });
 
-  it('condition({spdy: "1", method: "GET"}, "!=")', () => {
+  it('where({spdy: "1", method: "GET"}, "!=")', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition({
+    ql.where({
       spdy: '1',
       method: 'GET',
     }, '!=');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" != \'1\' and "method" != \'GET\')');
   });
 
-  it('condition({spdy: "1", method: "GET"}, "or")', () => {
+  it('where({spdy: "1", method: "GET"}, "or")', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition({
+    ql.where({
       spdy: '1',
       method: 'GET',
     }, 'or');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" = \'1\' or "method" = \'GET\')');
   });
 
-  it('condition("spdy = \'1\' and method = \'GET\'")', () => {
+  it('where("spdy = \'1\' and method = \'GET\'")', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition("spdy = '1' and method = 'GET'");
+    ql.where("spdy = '1' and method = 'GET'");
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where (spdy = \'1\' and method = \'GET\')');
   });
 
-  it('condition({spdy: "/1|2/"})', () => {
+  it('where({spdy: "/1|2/"})', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition({spdy: '/1|2/'});
-    ql.condition({method: /GET/});
+    ql.where({spdy: '/1|2/'});
+    ql.where({method: /GET/});
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = /GET/ and "spdy" = /1|2/');
   });
 
-  it('condition({path: "/"}', () => {
+  it('where({path: "/"}', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition({path: '/'});
+    ql.where({path: '/'});
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "path" = \'/\'');
   });
 
-  it('condition({})', () => {
+  it('where({})', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
     ql.where({});
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
   });
 
-  it('call condition twice', () => {
+  it('call where twice', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition('spdy', '1');
-    ql.condition('method', 'GET');
+    ql.where('spdy', '1');
+    ql.where('method', 'GET');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = \'GET\' and "spdy" = \'1\'');
 
     ql.relation = 'or';
@@ -180,8 +180,8 @@ describe('influxdb-ql', () => {
   it('emptyConditions', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.condition('spdy', '1');
-    ql.condition('method', 'GET');
+    ql.where('spdy', '1');
+    ql.where('method', 'GET');
     ql.emptyConditions();
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
   });
@@ -372,28 +372,28 @@ describe('influxdb-ql', () => {
     const ql = new QL();
     ql.measurement = 'http';
 
-    ql.condition({
+    ql.where({
       code: 500,
       spdy: '1',
     });
     assert.equal(ql.toSelect(), 'select * from "http" where ("code" = 500 and "spdy" = \'1\')');
 
-    ql.condition('code', 404);
+    ql.where('code', 404);
     ql.relation = 'or';
     assert.equal(ql.toSelect(), 'select * from "http" where "code" = 404 or ("code" = 500 and "spdy" = \'1\')');
 
     ql.emptyConditions();
-    ql.condition('spdy', 'slow');
+    ql.where('spdy', 'slow');
     assert.equal(ql.toSelect(), 'select * from "http" where "spdy" = \'slow\'');
 
     ql.emptyConditions();
-    ql.condition('http spdy', 'slow');
+    ql.where('http spdy', 'slow');
     assert.equal(ql.toSelect(), 'select * from "http" where "http spdy" = \'slow\'');
   });
-  it('add or condition', () => {
+  it('add or where', () => {
     const ql = new QL();
     ql.measurement = 'http';
-    ql.condition('spdy', ['slow', 'fast']);
+    ql.where('spdy', ['slow', 'fast']);
     assert.equal(ql.toSelect(), 'select * from "http" where ("spdy" = \'slow\' or "spdy" = \'fast\')');
   });
 
@@ -450,7 +450,7 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * into "http copy" from "http"');
 
     ql.addFunction('mean', 'use');
-    ql.condition('spdy', 'slow');
+    ql.where('spdy', 'slow');
     ql.start = '2015-08-18T00:00:00Z';
     ql.end = '2015-08-18T00:30:00Z';
     ql.addGroup('time(10m)');
@@ -624,18 +624,18 @@ describe('influxdb/data_exploration', () => {
 
     // Return data where the tag key location has the tag value santa_monica:
     ql.addField('water_level');
-    ql.condition('location', 'santa_monica');
+    ql.where('location', 'santa_monica');
     assert.equal(ql.toSelect(), 'select "water_level" from "h2o_feet" where "location" = \'santa_monica\'');
 
     // Return data where the tag key location has no tag value (more on regular expressions later):
     ql.removeAllCondition();
     ql.removeField('water_level');
-    ql.condition('location', '/./', '!~');
+    ql.where('location', '/./', '!~');
     assert.equal(ql.toSelect(), 'select * from "h2o_feet" where "location" !~ /./');
 
     // Return data where the tag key location has no tag value (more on regular expressions later):
     ql.removeAllCondition();
-    ql.condition('location', '/./', '=~');
+    ql.where('location', '/./', '=~');
     assert.equal(ql.toSelect(), 'select * from "h2o_feet" where "location" =~ /./');
 
     // Return data from the past seven days:
@@ -645,19 +645,19 @@ describe('influxdb/data_exploration', () => {
 
     // Return data where the tag key location has the tag value coyote_creek and the field water_level is greater than 8 feet:
     ql.start = null;
-    ql.condition('location', 'coyote_creek');
-    ql.condition('water_level', 8, '>');
+    ql.where('location', 'coyote_creek');
+    ql.where('water_level', 8, '>');
     assert.equal(ql.toSelect(), 'select * from "h2o_feet" where "location" = \'coyote_creek\' and "water_level" > 8');
 
     // Return data where the tag key location has the tag value santa_monica and the field level description equals 'below 3 feet':
     ql.removeAllCondition();
-    ql.condition('location', 'santa_monica');
-    ql.condition('level description', 'below 3 feet');
+    ql.where('location', 'santa_monica');
+    ql.where('level description', 'below 3 feet');
     assert.equal(ql.toSelect(), 'select * from "h2o_feet" where "level description" = \'below 3 feet\' and "location" = \'santa_monica\'');
 
     // Return data where the field values in water_level plus 2 are greater than 11.9
     ql.removeAllCondition();
-    ql.condition('"water_level" + 2', 11.9, '>');
+    ql.where('"water_level" + 2', 11.9, '>');
     assert.equal(ql.toSelect(), 'select * from "h2o_feet" where "water_level" + 2 > 11.9');
   });
 
@@ -683,7 +683,7 @@ describe('influxdb/data_exploration', () => {
     ql.addCalculate('count', 'water_level');
     ql.start = '2015-08-19T00:00:00Z';
     ql.end = '2015-08-27T17:00:00Z';
-    ql.condition('location', 'coyote_creek');
+    ql.where('location', 'coyote_creek');
     ql.addGroup('time(3d)');
     assert.equal(ql.toSelect(), 'select count("water_level") from "h2o_feet" where "location" = \'coyote_creek\' and time <= \'2015-08-27T17:00:00Z\' and time >= \'2015-08-19T00:00:00Z\' group by time(3d)');
 
@@ -731,7 +731,7 @@ describe('influxdb/data_exploration', () => {
 
     ql.into = 'h2o_feet_copy';
     ql.addField('water_level');
-    ql.condition('location', 'coyote_creek');
+    ql.where('location', 'coyote_creek');
     assert.equal(ql.toSelect(), 'select "water_level" into "h2o_feet_copy" from "h2o_feet" where "location" = \'coyote_creek\'');
 
 
@@ -740,7 +740,7 @@ describe('influxdb/data_exploration', () => {
     ql.removeAllCondition();
     ql.into = 'average';
     ql.addCalculate('mean', 'water_level');
-    ql.condition('location', 'santa_monica');
+    ql.where('location', 'santa_monica');
     ql.start = '2015-08-18T00:00:00Z';
     ql.end = '2015-08-18T00:30:00Z';
     ql.addGroup('time(12m)');
@@ -755,7 +755,7 @@ describe('influxdb/data_exploration', () => {
     ql.intoRP = 'autogen';
     ql.addCalculate('mean', 'water_level');
     ql.addCalculate('max', 'water_level');
-    ql.condition('location', 'santa_monica');
+    ql.where('location', 'santa_monica');
     ql.start = '2015-08-18T00:00:00Z';
     ql.end = '2015-08-18T00:30:00Z';
     ql.addGroup('time(12m)');
@@ -814,7 +814,7 @@ describe('influxdb/data_exploration', () => {
     // Now include ORDER BY time DESC to get the newest five points from the same series:
     ql.addField('water_level');
     ql.measurement = 'h2o_feet';
-    ql.condition('location', 'santa_monica');
+    ql.where('location', 'santa_monica');
     ql.order = 'desc';
     ql.limit = 5;
     assert.equal(ql.toSelect(), 'select "water_level" from "h2o_feet" where "location" = \'santa_monica\' order by time desc limit 5');
@@ -826,7 +826,7 @@ describe('influxdb/data_exploration', () => {
     // Then get the second three points from that same series:
     ql.addField('water_level');
     ql.measurement = 'h2o_feet';
-    ql.condition('location', 'coyote_creek');
+    ql.where('location', 'coyote_creek');
     ql.limit = 3;
     ql.offset = 3;
     assert.equal(ql.toSelect(), 'select "water_level" from "h2o_feet" where "location" = \'coyote_creek\' limit 3 offset 3');
