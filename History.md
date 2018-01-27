@@ -1,3 +1,6 @@
+# 2.6.2
+  * Quote the date string when it includes `\s` or `-`
+
 # 2.6.1
   * Ignore empty condition query, #4
 

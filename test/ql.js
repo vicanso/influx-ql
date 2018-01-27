@@ -31,7 +31,7 @@ describe('influxdb-ql', () => {
     ql.RP = 'default';
     ql.addField('status', 'spdy', 'fetch time');
     ql.addGroup('spdy');
-    ql.start = '2016-01-01';
+    ql.start = '2018-01-27T05:38:56.145Z';
     ql.end = '-3h';
     ql.limit = 10;
     ql.slimit = 5;
@@ -41,7 +41,7 @@ describe('influxdb-ql', () => {
     ql.where('code', 400);
     ql.where('"use" <= 30');
     ql.fill = 0;
-    assert.equal(ql.toSelect(), 'select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= \'2016-01-01\' group by "spdy" fill(0) order by time desc limit 10 slimit 5 offset 10 soffset 5');
+    assert.equal(ql.toSelect(), 'select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= \'2018-01-27T05:38:56.145Z\' group by "spdy" fill(0) order by time desc limit 10 slimit 5 offset 10 soffset 5');
   });
 
   it('addField', () => {
