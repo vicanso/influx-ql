@@ -632,6 +632,11 @@ describe('influxdb/data_exploration', () => {
     ql.removeField('water_level');
     ql.where('location', '/./', '!~');
     assert.equal(ql.toSelect(), 'select * from "h2o_feet" where "location" !~ /./');
+    
+    ql.removeAllCondition();
+    ql.removeField('water_level');
+    ql.where('location', /./, '!~');
+    assert.equal(ql.toSelect(), 'select * from "h2o_feet" where "location" !~ /./');
 
     // Return data where the tag key location has no tag value (more on regular expressions later):
     ql.removeAllCondition();

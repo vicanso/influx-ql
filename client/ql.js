@@ -53,7 +53,7 @@ function getTimeCondition(time, type) {
   var timeDesc = '';
   if (time.charAt(0) === '-') {
     timeDesc = 'now() - ' + time.substring(1);
-  } else if (/\d{4}-\d{2}-\d{2}/.test(time)) {
+  } else if (/[\s-]+/.test(time)) {
     timeDesc = '\'' + time + '\'';
   } else {
     timeDesc = time;
@@ -287,6 +287,7 @@ function showKeys(type, measurement) {
  * ql.order = 'desc';
  * ql.offset = 10;
  * ql.addGroup('spdy');
+ * ql.addGroup('time(30s)');
  * ql.condition('code', 400);
  * ql.condition('use', 30, '<=');
  * ql.fill = 0;
@@ -303,6 +304,16 @@ var QL = function () {
     this.condition = this.where;
     this.clean();
   }
+
+  /**
+   * Set the database for influx ql
+   * @param {String} db - database's name
+   * @since 2.0.0
+   * @example
+   * const ql = new QL();
+   * ql.database = 'mydb';
+   */
+
 
   _createClass(QL, [{
     key: 'addField',
@@ -328,6 +339,12 @@ var QL = function () {
      * });
      * console.info(ql.toSelect());
      * // => select "fetch time" as "ft" from "mydb".."http"
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addField('"use" + 2');
+     * console.info(ql.toSelect());
+     * // => select "use" + 2 from "mydb".."http"
      */
     value: function addField() {
       var args = Array.from(arguments);
@@ -401,6 +418,12 @@ var QL = function () {
      * @example
      * const ql = new QL();
      * ql.measurement = 'http';
+     * ql.where('code', 500);
+     * console.info(ql.toSelect());
+     * // => select * from "http" where "code" = 500
+     * @example
+     * const ql = new QL();
+     * ql.measurement = 'http';
      * ql.where({
      *   code: 500,
      *   spdy: '1',
@@ -422,6 +445,12 @@ var QL = function () {
      * }, '!=');
      * console.info(ql.toSelect());
      * // => select * from "http" where ("code" != 500 and "spdy" != '1')
+     * @example
+     * const ql = new QL();
+     * ql.measurement = 'http';
+     * ql.where('code', /5\d{2}/);
+     * console.info(ql.toSelect());
+     * // => select * from "http" where "code" = /5\d{2}/
      */
 
   }, {
@@ -440,7 +469,9 @@ var QL = function () {
       var operator = getOperator(args);
 
       var condition = getConditions(data, operator, relation);
-      addToArray(internal(this).conditions, [condition]);
+      if (condition) {
+        addToArray(internal(this).conditions, [condition]);
+      }
       return this;
     }
 
@@ -554,6 +585,7 @@ var QL = function () {
      * ql.addFunction('mean', 'use');
      * ql.removeFunction('count', 'use');
      * ql.addGroup('spdy');
+     * ql.addGroup('time(6h)');
      * console.info(ql.toSelect());
      * // => select mean("use") from "mydb".."http" group by "spdy"
      */
@@ -614,6 +646,13 @@ var QL = function () {
      * ql.addFunction('count', 'use');
      * console.info(ql.toSelect());
      * // => select count("use") from "mydb".."http" group by "method","spdy"
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addGroup('spdy', 'time(1m)');
+     * ql.addFunction('count', 'use');
+     * console.info(ql.toSelect());
+     * // => select count("use") from "mydb".."http" group by "method","time(1m)"
      */
 
   }, {
@@ -809,18 +848,79 @@ var QL = function () {
     set: function set(v) {
       internal(this).db = v;
       return this;
-    },
+    }
+
+    /**
+     * Get the database
+     * @since 2.0.0
+     * @example
+     * console.info(ql.database);
+     */
+    ,
     get: function get() {
       return internal(this).db;
     }
+
+    /**
+     * Set the database for select into
+     * @param {String} database - database's name
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.mearsurement = 'http';
+     * ql.rp = 'my-rp';
+     * ql.intoDatabase = 'mydb copy';
+     * ql.into = 'http copy';
+     * ql.intoRP = 'my-rp-copy';
+     */
+
   }, {
     key: 'intoDatabase',
     set: function set(v) {
       internal(this).intoDB = v;
       return this;
-    },
+    }
+
+    /**
+     * Get the database for select into
+     * @since 2.0.0
+     * @example
+     * console.info(ql.intoDatabase);
+     */
+    ,
     get: function get() {
       return internal(this).intoDB;
+    }
+
+    /**
+     * Set the measurement for select into
+     * @param {String} measurement - measurement's name
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.mearsurement = 'http';
+     * ql.rp = 'my-rp';
+     * ql.intoDatabase = 'mydb copy';
+     * ql.into = 'http copy';
+     * ql.intoRP = 'my-rp-copy';
+     */
+
+  }, {
+    key: 'into',
+    set: function set(v) {
+      internal(this).into = v;
+      return this;
+    }
+
+    /**
+     * Get the measurement for select into
+     * @since 2.0.0
+     * @example
+     * console.info(ql.into);
+     */
+    ,
+    get: function get() {
+      return internal(this).into;
     }
 
     /**
@@ -854,12 +954,34 @@ var QL = function () {
     get: function get() {
       return internal(this).rp;
     }
+
+    /**
+     * Set the rp for select into
+     * @param {String} rp - retention policy
+     * @since 2.0.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.mearsurement = 'http';
+     * ql.rp = 'my-rp';
+     * ql.intoDatabase = 'mydb copy';
+     * ql.into = 'http copy';
+     * ql.intoRP = 'my-rp-copy';
+     */
+
   }, {
     key: 'intoRP',
     set: function set(v) {
       internal(this).intoRP = v;
       return this;
-    },
+    }
+
+    /**
+     * Get the rp for select into
+     * @since 2.0.0
+     * @example
+     * console.info(ql.intoRP);
+     */
+    ,
     get: function get() {
       return internal(this).intoRP;
     }
@@ -905,6 +1027,18 @@ var QL = function () {
      * ql.start = '-3h';
      * console.info(ql.toSelect());
      * // => select * from "mydb".."http" where time >= now() - 3h
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.start = '2015-08-18T00:00:00Z';
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" where time >= '2015-08-18T00:00:00Z'
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.start = '1388534400s;
+     * console.info(ql.toSelect());
+     * // => select * from "mydb".."http" where time >= 1388534400s
      */
 
   }, {
@@ -1060,16 +1194,6 @@ var QL = function () {
     get: function get() {
       return internal(this).fill;
     }
-  }, {
-    key: 'into',
-    set: function set(v) {
-      internal(this).into = v;
-      return this;
-    },
-    get: function get() {
-      return internal(this).into;
-    }
-
     /**
      * Set the influx query result order of time
      * @param  {String} order - 'desc' or 'asc'
