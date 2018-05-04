@@ -430,6 +430,9 @@ describe('influxdb-ql', () => {
     ql.removeGroup('status', 'time(6h)', 'spdy');
     ql.addGroup('ajax status');
     assert.equal(ql.toSelect(), 'select mean("use") from "http" group by "ajax status"');
+
+    ql.addGroup('time(6h, 10m)', 'spdy')
+    assert.equal(ql.toSelect(), 'select mean("use") from "http" group by "ajax status","spdy",time(6h, 10m)');
   });
 
   it('fill', () => {
