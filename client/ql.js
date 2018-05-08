@@ -109,7 +109,7 @@ function convertConditionValue(value) {
 }
 
 function convertGroupValue(value) {
-  var reg = /time\(\S+\)/;
+  var reg = /time\([\S\s]+?\)/;
   if (value === '*' || value.match(reg)) {
     return value;
   }
