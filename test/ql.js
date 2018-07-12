@@ -517,6 +517,16 @@ describe('influxdb-ql', () => {
   });
 
 
+  it('multiQuery', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addFunction('max', 'fetch time');
+    ql.addGroup('spdy');
+    ql.multiQuery();
+    ql.addFunction('sum', 'max');
+    assert.equal(ql.toSelect(), 'select max("fetch time") from "mydb".."http" group by "spdy";select sum("max") from "mydb".."http"');
+  });
+
   it('CQ', () => {
     const ql = new QL();
     ql.measurement = 'http';
