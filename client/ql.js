@@ -771,7 +771,11 @@ var QL = function () {
 
       arr.push(getQL(data));
 
-      return arr.join(' ');
+      var str = arr.join(' ');
+      if (data.multi) {
+        return data.multi + ';' + str;
+      }
+      return str;
     }
     /**
      * Set the sub query string, it will get the current ql for sub query
@@ -795,6 +799,33 @@ var QL = function () {
       var subQuery = this.toSelect();
       this.clean();
       data.subQuery = subQuery;
+      return this;
+    }
+    /**
+     * Multi query
+     * @since 2.7.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.measurement = 'http';
+     * ql.addFunction('max', 'fetch time');
+     * ql.addGroup('spdy');
+     * ql.multiQuery();
+     * ql.addFunction('sum', 'max');
+     * console.info(ql.toSelect());
+     * // => select max("fetch time") from "mydb".."http" group by "spdy";
+     * select sum("max") from "mydb".."http"
+     */
+
+  }, {
+    key: 'multiQuery',
+    value: function multiQuery() {
+      var data = internal(this);
+      var query = this.toSelect();
+      this.clean();
+      if (!data.multi) {
+        data.multi = [];
+      }
+      data.multi = query;
       return this;
     }
 
