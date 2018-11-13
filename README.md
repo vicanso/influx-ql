@@ -13,7 +13,7 @@ Get influx ql
 ```js
 const QL = require('influx-ql');
 const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.RP = 'default';
 ql.addField('status', 'spdy', 'fetch time');
 ql.start = '2016-01-01';
@@ -34,7 +34,7 @@ The enhance where function
 ```js
 const QL = require('influx-ql');
 const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 
 // select * from "mydb".."http" where "spdy" = '1'
 ql.where("spdy", "1");
@@ -75,7 +75,7 @@ ql.relation = 'or';
 
 // select sum("max") from (select max("fetch time") from "mydb".."http" group by "spdy")
 ql.clean();
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction('max', 'fetch time');
 ql.addGroup('spdy');
 ql.subQuery();
