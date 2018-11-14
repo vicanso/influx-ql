@@ -389,6 +389,10 @@ describe('influxdb-ql', () => {
     ql.emptyConditions();
     ql.where('http spdy', 'slow');
     assert.equal(ql.toSelect(), 'select * from "http" where "http spdy" = \'slow\'');
+
+    ql.emptyConditions();
+    ql.where('field_or_tag', '"field_or_tag"', '| 10 =');
+    assert.equal(ql.toSelect(), 'select * from "http" where "field_or_tag" | 10 = "field_or_tag"');
   });
   it('add or where', () => {
     const ql = new QL();
