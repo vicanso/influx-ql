@@ -22,7 +22,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="QL.html">QL</a><ul class='methods'><li data-type='method'><a href="QL.html#addField">addField</a></li><li data-type='method'><a href="QL.html#addFunction">addFunction</a></li><li data-type='method'><a href="QL.html#addGroup">addGroup</a></li><li data-type='method'><a href="QL.html#clean">clean</a></li><li data-type='method'><a href="QL.html#emptyConditions">emptyConditions</a></li><li data-type='method'><a href="QL.html#emptyFields">emptyFields</a></li><li data-type='method'><a href="QL.html#emptyFunctions">emptyFunctions</a></li><li data-type='method'><a href="QL.html#emptyGroups">emptyGroups</a></li><li data-type='method'><a href="QL.html#multiQuery">multiQuery</a></li><li data-type='method'><a href="QL.html#removeField">removeField</a></li><li data-type='method'><a href="QL.html#removeFunction">removeFunction</a></li><li data-type='method'><a href="QL.html#removeGroup">removeGroup</a></li><li data-type='method'><a href="QL.html#subQuery">subQuery</a></li><li data-type='method'><a href="QL.html#toSelect">toSelect</a></li><li data-type='method'><a href="QL.html#where">where</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="QL.html">QL</a><ul class='methods'><li data-type='method'><a href="QL.html#addField">addField</a></li><li data-type='method'><a href="QL.html#addFunction">addFunction</a></li><li data-type='method'><a href="QL.html#addGroup">addGroup</a></li><li data-type='method'><a href="QL.html#addMeasurement">addMeasurement</a></li><li data-type='method'><a href="QL.html#clean">clean</a></li><li data-type='method'><a href="QL.html#emptyConditions">emptyConditions</a></li><li data-type='method'><a href="QL.html#emptyFields">emptyFields</a></li><li data-type='method'><a href="QL.html#emptyFunctions">emptyFunctions</a></li><li data-type='method'><a href="QL.html#emptyGroups">emptyGroups</a></li><li data-type='method'><a href="QL.html#emptyMeasurements">emptyMeasurements</a></li><li data-type='method'><a href="QL.html#multiQuery">multiQuery</a></li><li data-type='method'><a href="QL.html#removeField">removeField</a></li><li data-type='method'><a href="QL.html#removeFunction">removeFunction</a></li><li data-type='method'><a href="QL.html#removeGroup">removeGroup</a></li><li data-type='method'><a href="QL.html#removeMeasurement">removeMeasurement</a></li><li data-type='method'><a href="QL.html#subQuery">subQuery</a></li><li data-type='method'><a href="QL.html#toSelect">toSelect</a></li><li data-type='method'><a href="QL.html#where">where</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -69,7 +69,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line287">line 287</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line296">line 296</a>
     </li></ul></dd>
     
 
@@ -120,7 +120,7 @@
     
     <pre class="prettyprint"><code>const QL = require('influx-ql');
 const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.RP = 'two-weeks';
 ql.addField('status', 'spdy', 'fetch time');
 ql.start = '2016-01-01';
@@ -181,7 +181,7 @@ console.info(ql.toSelect());</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line304">line 304</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line316">line 316</a>
     </li></ul></dd>
     
 
@@ -253,7 +253,7 @@ ql.database = 'mydb';</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line315">line 315</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line327">line 327</a>
     </li></ul></dd>
     
 
@@ -324,7 +324,7 @@ ql.database = 'mydb';</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line522">line 522</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line507">line 507</a>
     </li></ul></dd>
     
 
@@ -379,7 +379,7 @@ ql.database = 'mydb';</code></pre>
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.end = '-1h';
 console.info(ql.end);
 // => '-1h';</code></pre>
@@ -399,7 +399,7 @@ console.info(ql.end);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line508">line 508</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line493">line 493</a>
     </li></ul></dd>
     
 
@@ -454,7 +454,7 @@ console.info(ql.end);
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.end = '-1h';
 console.info(ql.toSelect());
 // => select * from "mydb".."http" where time &lt;= now() - 1h</code></pre>
@@ -474,7 +474,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line610">line 610</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line580">line 580</a>
     </li></ul></dd>
     
 
@@ -517,7 +517,7 @@ console.info(ql.toSelect());
 
 
 <div class="description">
-    <p>Get the influx query result fill value for time intervals that have no data</p>
+    <p>Set the influx query result fill value for time intervals that have no data</p>
 </div>
 
 
@@ -529,11 +529,11 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addGroup('spdy');
 ql.fill = 0;
-console.info(ql.fill);
-// => 0</code></pre>
+console.info(ql.toSelect());
+// => select * from "mydb".."http" group by "spdy" fill(0)</code></pre>
 
 
 
@@ -593,7 +593,7 @@ console.info(ql.fill);
 
 
 <div class="description">
-    <p>Set the influx query result fill value for time intervals that have no data</p>
+    <p>Get the influx query result fill value for time intervals that have no data</p>
 </div>
 
 
@@ -605,11 +605,11 @@ console.info(ql.fill);
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addGroup('spdy');
 ql.fill = 0;
-console.info(ql.toSelect());
-// => select * from "mydb".."http" group by "spdy" fill(0)</code></pre>
+console.info(ql.fill);
+// => 0</code></pre>
 
 
 
@@ -626,7 +626,78 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line358">line 358</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line381">line 381</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Get the measurement for select into</p>
+</div>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>console.info(ql.into);</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="into"><span class="type-signature"></span>into<span class="type-signature"></span></h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line370">line 370</a>
     </li></ul></dd>
     
 
@@ -691,7 +762,7 @@ ql.intoRP = 'my-rp-copy';</code></pre>
 
         
             
-<h4 class="name" id="into"><span class="type-signature"></span>into<span class="type-signature"></span></h4>
+<h4 class="name" id="intoDatabase"><span class="type-signature"></span>intoDatabase<span class="type-signature"></span></h4>
 
 
 
@@ -702,7 +773,7 @@ ql.intoRP = 'my-rp-copy';</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line369">line 369</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line354">line 354</a>
     </li></ul></dd>
     
 
@@ -745,7 +816,7 @@ ql.intoRP = 'my-rp-copy';</code></pre>
 
 
 <div class="description">
-    <p>Get the measurement for select into</p>
+    <p>Get the database for select into</p>
 </div>
 
 
@@ -756,7 +827,7 @@ ql.intoRP = 'my-rp-copy';</code></pre>
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>console.info(ql.into);</code></pre>
+    <pre class="prettyprint"><code>console.info(ql.intoDatabase);</code></pre>
 
 
 
@@ -773,7 +844,7 @@ ql.intoRP = 'my-rp-copy';</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line331">line 331</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line343">line 343</a>
     </li></ul></dd>
     
 
@@ -838,77 +909,6 @@ ql.intoRP = 'my-rp-copy';</code></pre>
 
         
             
-<h4 class="name" id="intoDatabase"><span class="type-signature"></span>intoDatabase<span class="type-signature"></span></h4>
-
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line342">line 342</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description">
-    <p>Get the database for select into</p>
-</div>
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>console.info(ql.intoDatabase);</code></pre>
-
-
-
-        
-            
 <h4 class="name" id="intoRP"><span class="type-signature"></span>intoRP<span class="type-signature"></span></h4>
 
 
@@ -920,7 +920,7 @@ ql.intoRP = 'my-rp-copy';</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line425">line 425</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line437">line 437</a>
     </li></ul></dd>
     
 
@@ -991,7 +991,7 @@ ql.intoRP = 'my-rp-copy';</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line414">line 414</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line426">line 426</a>
     </li></ul></dd>
     
 
@@ -1067,7 +1067,7 @@ ql.intoRP = 'my-rp-copy';</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line551">line 551</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line536">line 536</a>
     </li></ul></dd>
     
 
@@ -1122,7 +1122,7 @@ ql.intoRP = 'my-rp-copy';</code></pre>
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.limit = 10;
 console.info(ql.limit);
 // => 10</code></pre>
@@ -1142,7 +1142,7 @@ console.info(ql.limit);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line537">line 537</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line522">line 522</a>
     </li></ul></dd>
     
 
@@ -1197,158 +1197,10 @@ console.info(ql.limit);
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.limit = 10;
 console.info(ql.toSelect());
 // => select * from "mydb".."http" limit 10</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="measurement"><span class="type-signature"></span>measurement<span class="type-signature"></span></h4>
-
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line452">line 452</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description">
-    <p>Get influx ql measurement</p>
-</div>
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
-console.info(ql.measurement);
-// => 'http'</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="measurement"><span class="type-signature"></span>measurement<span class="type-signature"></span></h4>
-
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line439">line 439</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description">
-    <p>Set influx ql measurement</p>
-</div>
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
-console.info(ql.toSelect());
-// => select * from "mydb".."http"</code></pre>
 
 
 
@@ -1365,7 +1217,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line657">line 657</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line642">line 642</a>
     </li></ul></dd>
     
 
@@ -1420,7 +1272,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.offset = 10;
 console.info(ql.toSelect());
 // => select * from "mydb".."http" offset 10</code></pre>
@@ -1440,7 +1292,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line673">line 673</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line658">line 658</a>
     </li></ul></dd>
     
 
@@ -1495,7 +1347,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 console.info(ql.offset);
 // => 0
 ql.offset = 10;
@@ -1517,7 +1369,7 @@ console.info(ql.offset);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line625">line 625</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line610">line 610</a>
     </li></ul></dd>
     
 
@@ -1572,7 +1424,7 @@ console.info(ql.offset);
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addGroup('spdy');
 ql.order = 'desc';
 console.info(ql.toSelect());
@@ -1593,7 +1445,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line642">line 642</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line627">line 627</a>
     </li></ul></dd>
     
 
@@ -1648,7 +1500,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addGroup('spdy');
 console.info(ql.order);
 // => undefined
@@ -1670,7 +1522,7 @@ ql.order = 'desc';
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line732">line 732</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line717">line 717</a>
     </li></ul></dd>
     
 
@@ -1746,7 +1598,7 @@ console.info(ql.relation);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line716">line 716</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line701">line 701</a>
     </li></ul></dd>
     
 
@@ -1819,7 +1671,7 @@ console.info(ql.relation);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line385">line 385</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line397">line 397</a>
     </li></ul></dd>
     
 
@@ -1874,7 +1726,7 @@ console.info(ql.relation);
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.RP = 'two-weeks';
 console.info(ql.toSelect());
 // => select * from "mydb"."two-weeks"."http"</code></pre>
@@ -1894,7 +1746,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line398">line 398</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line410">line 410</a>
     </li></ul></dd>
     
 
@@ -1949,7 +1801,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.RP = 'two-weeks';
 console.info(ql.RP);
 // => two-weeks</code></pre>
@@ -1969,7 +1821,7 @@ console.info(ql.RP);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line579">line 579</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line564">line 564</a>
     </li></ul></dd>
     
 
@@ -2043,7 +1895,7 @@ console.info(ql.slimit);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line565">line 565</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line550">line 550</a>
     </li></ul></dd>
     
 
@@ -2117,81 +1969,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line687">line 687</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description">
-    <p>Set influx ql offset series in the query results</p>
-</div>
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.soffset = 10;
-console.info(ql.toSelect());
-// => select * from "mydb" soffset 10</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="soffset"><span class="type-signature"></span>soffset<span class="type-signature"></span></h4>
-
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line703">line 703</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line688">line 688</a>
     </li></ul></dd>
     
 
@@ -2256,6 +2034,80 @@ console.info(ql.soffset);
 
         
             
+<h4 class="name" id="soffset"><span class="type-signature"></span>soffset<span class="type-signature"></span></h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line672">line 672</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Set influx ql offset series in the query results</p>
+</div>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const ql = new QL('mydb');
+ql.soffset = 10;
+console.info(ql.toSelect());
+// => select * from "mydb" soffset 10</code></pre>
+
+
+
+        
+            
 <h4 class="name" id="start"><span class="type-signature"></span>start<span class="type-signature"></span></h4>
 
 
@@ -2267,7 +2119,7 @@ console.info(ql.soffset);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line479">line 479</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line464">line 464</a>
     </li></ul></dd>
     
 
@@ -2322,19 +2174,19 @@ console.info(ql.soffset);
     <h5>Examples</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.start = '-3h';
 console.info(ql.toSelect());
 // => select * from "mydb".."http" where time >= now() - 3h</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.start = '2015-08-18T00:00:00Z';
 console.info(ql.toSelect());
 // => select * from "mydb".."http" where time >= '2015-08-18T00:00:00Z'</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.start = '1388534400s;
 console.info(ql.toSelect());
 // => select * from "mydb".."http" where time >= 1388534400s</code></pre>
@@ -2354,7 +2206,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line493">line 493</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line478">line 478</a>
     </li></ul></dd>
     
 
@@ -2409,7 +2261,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.start = '-3h';
 console.info(ql.start);
 // => '-3h';</code></pre>
@@ -2439,7 +2291,7 @@ console.info(ql.start);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line791">line 791</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line838">line 838</a>
     </li></ul></dd>
     
 
@@ -2496,13 +2348,13 @@ console.info(ql.start);
     <h5>Examples</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addField('status', 'spdy', 'fetch time');
 console.info(ql.toSelect());
 // => select "fetch time","spdy","status" from "mydb".."http"</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addField({
   'fetch time': 'ft',
 });
@@ -2510,7 +2362,7 @@ console.info(ql.toSelect());
 // => select "fetch time" as "ft" from "mydb".."http"</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addField('"use" + 2');
 console.info(ql.toSelect());
 // => select "use" + 2 from "mydb".."http"</code></pre>
@@ -2608,7 +2460,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line978">line 978</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1025">line 1025</a>
     </li></ul></dd>
     
 
@@ -2665,7 +2517,7 @@ console.info(ql.toSelect());
     <h5>Examples</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction('count', 'use');
 ql.addFunction('mean', 'use');
 ql.addGroup('spdy');
@@ -2673,19 +2525,19 @@ console.info(ql.toSelect());
 // => select count("use"),mean("use") from "mydb".."http" group by "spdy"</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction("bottom", 'use', 3);
 console.info(ql.toSelect());
 // => select bottom("use",3) from "mydb".."http"</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction('count("use")');
 console.info(ql.toSelect());
 // => select count("use") from "mydb".."http"</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction('count("use")', {
   alias: 'countUse',
 });
@@ -2693,7 +2545,7 @@ console.info(ql.toSelect());
 // => select count("use") as "countUse" from "mydb".."http"</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction('count', 'use', {
   alias: 'countUse',
 });
@@ -2870,7 +2722,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1078">line 1078</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1125">line 1125</a>
     </li></ul></dd>
     
 
@@ -2927,14 +2779,14 @@ console.info(ql.toSelect());
     <h5>Examples</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addGroup('spdy', 'method');
 ql.addFunction('count', 'use');
 console.info(ql.toSelect());
 // => select count("use") from "mydb".."http" group by "method","spdy"</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addGroup('spdy', 'time(1m)');
 ql.addFunction('count', 'use');
 console.info(ql.toSelect());
@@ -3029,6 +2881,176 @@ console.info(ql.toSelect());
 
     
 
+    <h4 class="name" id="addMeasurement"><span class="type-signature"></span>addMeasurement<span class="signature">(measurement)</span><span class="type-signature"> &rarr; {<a href="QL.html">QL</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line769">line 769</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Add influx ql measurement</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>const ql = new QL('mydb');
+ql.addMeasurement('http');
+ql.addFunction('count', 'use');
+console.info(ql.toSelect());
+// => select count("use") from "mydb".."http"</code></pre>
+
+    <pre class="prettyprint"><code>const ql = new QL('mydb');
+ql.addMeasurement('http');
+ql.addMeasurement('https');
+ql.addFunction('count', 'use');
+console.info(ql.toSelect());
+// => select count("use") from "mydb".."http","mydb".."https"</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>measurement</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>measurement name</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="QL.html">QL</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
     <h4 class="name" id="clean"><span class="type-signature"></span>clean<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
@@ -3041,7 +3063,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1244">line 1244</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1291">line 1291</a>
     </li></ul></dd>
     
 
@@ -3098,7 +3120,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addField('fetch time');
 ql.addGroup('spdy');
 ql.clean();
@@ -3139,7 +3161,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line928">line 928</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line975">line 975</a>
     </li></ul></dd>
     
 
@@ -3196,7 +3218,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL();
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.condition({
   code: 500,
   spyd: '1',
@@ -3259,7 +3281,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line840">line 840</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line887">line 887</a>
     </li></ul></dd>
     
 
@@ -3316,7 +3338,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addField('status', 'spdy', 'fetch time');
 ql.emptyFields();
 console.info(ql.toSelect());
@@ -3366,7 +3388,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1053">line 1053</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1100">line 1100</a>
     </li></ul></dd>
     
 
@@ -3423,7 +3445,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction('count', 'use');
 ql.addFunction('mean', 'use');
 ql.emptyFunctions();
@@ -3483,7 +3505,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1117">line 1117</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1164">line 1164</a>
     </li></ul></dd>
     
 
@@ -3540,11 +3562,125 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addGroup('spdy', 'method');
 ql.emptyGroups();
 console.info(ql.toSelect());
 // => select * from "mydb".."http"</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="QL.html">QL</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="emptyMeasurements"><span class="type-signature"></span>emptyMeasurements<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QL.html">QL</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line806">line 806</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Empty influx ql measurements</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const ql = new QL('mydb');
+ql.addMeasurement('http', 'https');
+ql.emptyMeasurements();
+console.info(ql.toSelect());
+// => select * from "mydb"</code></pre>
 
 
 
@@ -3598,7 +3734,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1221">line 1221</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1268">line 1268</a>
     </li></ul></dd>
     
 
@@ -3655,7 +3791,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction('max', 'fetch time');
 ql.addGroup('spdy');
 ql.multiQuery();
@@ -3698,7 +3834,7 @@ select sum("max") from "mydb".."http"</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line809">line 809</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line856">line 856</a>
     </li></ul></dd>
     
 
@@ -3755,7 +3891,7 @@ select sum("max") from "mydb".."http"</code></pre>
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addField('status', 'spdy', 'fetch time');
 ql.removeField('status');
 console.info(ql.toSelect());
@@ -3854,7 +3990,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1019">line 1019</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1066">line 1066</a>
     </li></ul></dd>
     
 
@@ -3911,7 +4047,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction('count', 'use');
 ql.addFunction('mean', 'use');
 ql.removeFunction('count', 'use');
@@ -4067,7 +4203,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1098">line 1098</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1145">line 1145</a>
     </li></ul></dd>
     
 
@@ -4124,7 +4260,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addGroup('spdy', 'method');
 ql.removeGroup('spdy')
 ql.addFunction('count', 'use');
@@ -4220,6 +4356,170 @@ console.info(ql.toSelect());
 
     
 
+    <h4 class="name" id="removeMeasurement"><span class="type-signature"></span>removeMeasurement<span class="signature">(measurement)</span><span class="type-signature"> &rarr; {<a href="QL.html">QL</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line788">line 788</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Remove influx ql measurement</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const ql = new QL('mydb');
+ql.addMeasurement('foo', 'bar');
+ql.removeMeasurement('foo')
+ql.addFunction('count', 'use');
+console.info(ql.toSelect());
+// => select count("use") from "mydb".."bar"</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>measurement</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>measurement name</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="QL.html">QL</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
     <h4 class="name" id="subQuery"><span class="type-signature"></span>subQuery<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
@@ -4232,7 +4532,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1200">line 1200</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1247">line 1247</a>
     </li></ul></dd>
     
 
@@ -4290,7 +4590,7 @@ and clean the query options</p>
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.addFunction('max', 'fetch time');
 ql.addGroup('spdy');
 ql.subQuery();
@@ -4332,7 +4632,7 @@ console.info(ql.toSelect());
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1143">line 1143</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line1190">line 1190</a>
     </li></ul></dd>
     
 
@@ -4389,7 +4689,7 @@ console.info(ql.toSelect());
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>const ql = new QL('mydb');
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.RP = 'two-weeks';
 ql.addField('status', 'spdy', 'fetch time');
 ql.start = '2016-01-01';
@@ -4455,7 +4755,7 @@ console.info(ql.toSelect());</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line891">line 891</a>
+        <a href="ql.js.html">ql.js</a>, <a href="ql.js.html#line938">line 938</a>
     </li></ul></dd>
     
 
@@ -4512,13 +4812,13 @@ console.info(ql.toSelect());</code></pre>
     <h5>Examples</h5>
     
     <pre class="prettyprint"><code>const ql = new QL();
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.where('code', 500);
 console.info(ql.toSelect());
 // => select * from "http" where "code" = 500</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL();
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.where({
   code: 500,
   spdy: '1',
@@ -4527,13 +4827,13 @@ console.info(ql.toSelect());
 // => select * from "http" where ("code" = 500 and "spdy" = '1')</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL();
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.where('spdy', ['1', '2']);
 console.info(ql.toSelect());
 // => select * from "mydb".."http" where ("spdy" = '1' or "spdy" = '2')</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL();
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.where({
   code: 500,
   spdy: '1',
@@ -4542,7 +4842,7 @@ console.info(ql.toSelect());
 // => select * from "http" where ("code" != 500 and "spdy" != '1')</code></pre>
 
     <pre class="prettyprint"><code>const ql = new QL();
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.where('code', /5\d{2}/);
 console.info(ql.toSelect());
 // => select * from "http" where "code" = /5\d{2}/</code></pre>
@@ -4718,7 +5018,7 @@ console.info(ql.toSelect());
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Jul 12 2018 21:01:01 GMT+0800 (China Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Nov 13 2018 21:52:15 GMT+0300 (MSK) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
