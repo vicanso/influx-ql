@@ -27,7 +27,7 @@ describe('influxdb-ql', () => {
 
   it('basic query', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.RP = 'default';
     ql.addField('status', 'spdy', 'fetch time');
     ql.addGroup('spdy');
@@ -46,14 +46,14 @@ describe('influxdb-ql', () => {
 
   it('addField', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addField('status', 'spdy', 'fetch time');
     assert.equal(ql.toSelect(), 'select "fetch time","spdy","status" from "mydb".."http"');
   });
 
   it('addField use alias', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addField({
       'fetch time': 'ft',
     });
@@ -62,7 +62,7 @@ describe('influxdb-ql', () => {
 
   it('removeField', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addField('status', 'spdy', 'fetch time');
     ql.removeField('spdy', 'fetch time');
     assert.equal(ql.toSelect(), 'select "status" from "mydb".."http"');
@@ -70,7 +70,7 @@ describe('influxdb-ql', () => {
 
   it('removeField is use alias', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addField({
       'fetch time': 'ft',
     });
@@ -80,7 +80,7 @@ describe('influxdb-ql', () => {
 
   it('emptyFields', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addField('status', 'spdy', 'fetch time');
     ql.emptyFields();
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
@@ -88,28 +88,28 @@ describe('influxdb-ql', () => {
 
   it('where("spdy", "1")', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where('spdy', '1');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "spdy" = \'1\'');
   });
 
   it('where("spdy", ["1", "2"])', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where('spdy', ['1', '2']);
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where ("spdy" = \'1\' or "spdy" = \'2\')');
   });
 
   it('where("use", 300, ">=")', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where('use', 300, '>=');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "use" >= 300');
   });
 
   it('where({spdy: "1", method: "GET"})', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where({
       spdy: '1',
       method: 'GET',
@@ -119,7 +119,7 @@ describe('influxdb-ql', () => {
 
   it('where({spdy: "1", method: "GET"}, "!=")', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where({
       spdy: '1',
       method: 'GET',
@@ -129,7 +129,7 @@ describe('influxdb-ql', () => {
 
   it('where({spdy: "1", method: "GET"}, "or")', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where({
       spdy: '1',
       method: 'GET',
@@ -139,14 +139,14 @@ describe('influxdb-ql', () => {
 
   it('where("spdy = \'1\' and method = \'GET\'")', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where("spdy = '1' and method = 'GET'");
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where (spdy = \'1\' and method = \'GET\')');
   });
 
   it('where({spdy: "/1|2/"})', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where({spdy: '/1|2/'});
     ql.where({method: /GET/});
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = /GET/ and "spdy" = /1|2/');
@@ -154,21 +154,21 @@ describe('influxdb-ql', () => {
 
   it('where({path: "/"}', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where({path: '/'});
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "path" = \'/\'');
   });
 
   it('where({})', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where({});
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
   });
 
   it('call where twice', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where('spdy', '1');
     ql.where('method', 'GET');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = \'GET\' and "spdy" = \'1\'');
@@ -179,7 +179,7 @@ describe('influxdb-ql', () => {
 
   it('emptyConditions', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where('spdy', '1');
     ql.where('method', 'GET');
     ql.emptyConditions();
@@ -190,8 +190,8 @@ describe('influxdb-ql', () => {
     const ql = new QL('mydb');
     ql.RP = 'test'
     ql.addMeasurement('http');
-    ql.addMeasurement('https');
-    assert.equal(ql.toSelect(), 'select * from "mydb"."test"."http","mydb"."test"."https"');
+    ql.addMeasurement('https', 'httpd');
+    assert.equal(ql.toSelect(), 'select * from "mydb"."test"."http","mydb"."test"."https","mydb"."test"."httpd"');
   });
 
   it('addMeasurement no retention policy', () => {
@@ -218,14 +218,15 @@ describe('influxdb-ql', () => {
 
   it('emptyMeasurements', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
+    ql.addMeasurement('https');
     ql.emptyMeasurements();
     assert.equal(ql.toSelect(), 'select * from "mydb"');
   });
 
   it('addFunction', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addGroup('spdy');
     ql.addFunction('count', 'use');
     assert.equal(ql.toSelect(), 'select count("use") from "mydb".."http" group by "spdy"');
@@ -233,21 +234,21 @@ describe('influxdb-ql', () => {
 
   it('addFunction, multi params', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addFunction('bottom', 'use', 3);
     assert.equal(ql.toSelect(), 'select bottom("use",3) from "mydb".."http"');
   });
 
   it('addFunction, single param', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addFunction('bottom("use",3)');
     assert.equal(ql.toSelect(), 'select bottom("use",3) from "mydb".."http"');
   });
 
   it('addFunction and addField', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addFunction('bottom("use",3)');
     ql.addField('spdy');
     assert.equal(ql.toSelect(), 'select "spdy",bottom("use",3) from "mydb".."http"');
@@ -255,7 +256,7 @@ describe('influxdb-ql', () => {
 
   it('addFunction and use alias', () => {
     let ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addFunction('bottom("use",3)', {
       alias: 'bot3Use',
     });
@@ -263,7 +264,7 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select "spdy",bottom("use",3) as "bot3Use" from "mydb".."http"');
 
     ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addFunction('bottom', 'use', 3, {
       alias: 'bot3Use',
     });
@@ -273,7 +274,7 @@ describe('influxdb-ql', () => {
 
   it('removeFunction', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addGroup('spdy');
     ql.addFunction('count', 'use');
     ql.addFunction('mean', 'use');
@@ -283,7 +284,7 @@ describe('influxdb-ql', () => {
 
   it('removeFunction use alias', () => {
     let ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addFunction('bottom("use",3)', {
       alias: 'bot3Use',
     });
@@ -294,7 +295,7 @@ describe('influxdb-ql', () => {
 
   it('emptyFunctions', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addGroup('spdy');
     ql.addFunction('count', 'use');
     ql.addFunction('mean', 'use');
@@ -305,7 +306,7 @@ describe('influxdb-ql', () => {
 
   it('addGroup', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addGroup('spdy', 'method');
     ql.addFunction('count', 'use');
     assert.equal(ql.toSelect(), 'select count("use") from "mydb".."http" group by "method","spdy"');
@@ -313,7 +314,7 @@ describe('influxdb-ql', () => {
 
   it('removeGroup', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addGroup('spdy', 'method');
     ql.addFunction('count', 'use');
     ql.removeGroup('spdy');
@@ -322,7 +323,7 @@ describe('influxdb-ql', () => {
 
   it('emptyGroups', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addGroup('spdy', 'method');
     ql.emptyGroups();
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
@@ -330,12 +331,12 @@ describe('influxdb-ql', () => {
 
   it('select *', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     assert.equal(ql.toSelect(), 'select * from "http"');
   });
   it('set db', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
 
     ql.RP = 'rp';
@@ -344,7 +345,7 @@ describe('influxdb-ql', () => {
   });
   it('select field', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addField('status');
     assert.equal(ql.toSelect(), 'select "status" from "http"');
 
@@ -357,7 +358,7 @@ describe('influxdb-ql', () => {
 
   it('select multi fields', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addField('status', 'code');
     assert.equal(ql.toSelect(), 'select "code","status" from "http"');
 
@@ -367,7 +368,7 @@ describe('influxdb-ql', () => {
 
   it('set start and end time', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.start = '2016-03-01 23:32:01.232';
     ql.end = '2016-03-02';
@@ -384,7 +385,7 @@ describe('influxdb-ql', () => {
 
   it('set limit', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.limit = 10;
 
@@ -393,7 +394,7 @@ describe('influxdb-ql', () => {
 
   it('set slimit', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.addGroup('*');
     ql.slimit = 10;
@@ -406,7 +407,7 @@ describe('influxdb-ql', () => {
 
   it('add conditions', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.where({
       code: 500,
@@ -428,7 +429,7 @@ describe('influxdb-ql', () => {
   });
   it('add or where', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.where('spdy', ['slow', 'fast']);
     assert.equal(ql.toSelect(), 'select * from "http" where ("spdy" = \'slow\' or "spdy" = \'fast\')');
   });
@@ -436,7 +437,7 @@ describe('influxdb-ql', () => {
 
   it('function', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.addFunction('mean', 'use');
     assert.equal(ql.toSelect(), 'select mean("use") from "http"');
@@ -454,7 +455,7 @@ describe('influxdb-ql', () => {
 
   it('group', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.addGroup('spdy');
     ql.addFunction('mean', 'use');
@@ -473,7 +474,7 @@ describe('influxdb-ql', () => {
 
   it('fill', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.addFunction('mean', 'use');
     ql.addGroup('spdy');
@@ -483,7 +484,7 @@ describe('influxdb-ql', () => {
 
   it('into', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.into = 'http copy';
     assert.equal(ql.toSelect(), 'select * into "http copy" from "http"');
@@ -501,7 +502,7 @@ describe('influxdb-ql', () => {
 
   it('from custom rp into', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.database = 'mydb';
     ql.rp = 'my-rp';
 
@@ -518,7 +519,7 @@ describe('influxdb-ql', () => {
 
   it('order', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.order = 'desc';
     assert.equal(ql.toSelect(), 'select * from "http" order by time desc');
@@ -526,7 +527,7 @@ describe('influxdb-ql', () => {
 
   it('offset', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
 
     ql.offset = 10;
     assert.equal(ql.toSelect(), 'select * from "http" offset 10');
@@ -534,7 +535,7 @@ describe('influxdb-ql', () => {
 
   it('clean', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addField('fetch time');
     ql.addGroup('spdy');
     assert.equal(ql.toSelect(), 'select "fetch time" from "mydb".."http" group by "spdy"');
@@ -544,7 +545,7 @@ describe('influxdb-ql', () => {
 
   it('subQuery', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addFunction('max', 'fetch time');
     ql.addGroup('spdy');
     ql.subQuery();
@@ -555,7 +556,7 @@ describe('influxdb-ql', () => {
 
   it('multiQuery', () => {
     const ql = new QL('mydb');
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.addFunction('max', 'fetch time');
     ql.addGroup('spdy');
     ql.multiQuery();
@@ -565,7 +566,7 @@ describe('influxdb-ql', () => {
 
   it('CQ', () => {
     const ql = new QL();
-    ql.addMeasurement('http');
+    ql.measurement = 'http';
     ql.database = 'mydb';
     ql.intoDatabase = 'mydb';
     ql.into = 'http copy';
