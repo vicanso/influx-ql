@@ -1,8 +1,10 @@
 'use strict';
+
 const QL = require('..');
+
 const ql = new QL('mydb');
 
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.into = 'http-count';
 
 ql.cqName = 'http-count-cq';

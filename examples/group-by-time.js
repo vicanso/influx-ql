@@ -1,8 +1,10 @@
 'use strict';
+
 const QL = require('..');
+
 const ql = new QL('mydb');
 
-ql.measurement = 'http';
+ql.addMeasurement('http');
 ql.start = '2016-04-01';
 ql.end = '-3h';
 ql.addFunction('count', 'code');

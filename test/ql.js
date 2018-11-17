@@ -186,6 +186,44 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
   });
 
+  it('addMeasurement', () => {
+    const ql = new QL('mydb');
+    ql.RP = 'test'
+    ql.addMeasurement('http');
+    ql.addMeasurement('https', 'httpd');
+    assert.equal(ql.toSelect(), 'select * from "mydb"."test"."http","mydb"."test"."https","mydb"."test"."httpd"');
+  });
+
+  it('addMeasurement no retention policy', () => {
+    const ql = new QL('mydb');
+    ql.addMeasurement('http');
+    ql.addMeasurement('https');
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http","mydb".."https"');
+  });
+
+  it('addMeasurement no db', () => {
+    const ql = new QL();
+    ql.addMeasurement('http');
+    ql.addMeasurement('https');
+    assert.equal(ql.toSelect(), 'select * from "http","https"');
+  });
+
+  it('removeMeasurement', () => {
+    const ql = new QL('mydb');
+    ql.addMeasurement('http');
+    ql.addMeasurement('https');
+    ql.removeMeasurement('http');
+    assert.equal(ql.toSelect(), 'select * from "mydb".."https"');
+  });
+
+  it('emptyMeasurements', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addMeasurement('https');
+    ql.emptyMeasurements();
+    assert.equal(ql.toSelect(), 'select * from "mydb"');
+  });
+
   it('addFunction', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
@@ -299,7 +337,6 @@ describe('influxdb-ql', () => {
   it('set db', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    assert.equal(ql.measurement, 'http');
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
 
     ql.RP = 'rp';
