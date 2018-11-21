@@ -1,3 +1,9 @@
+# 2.8.0
+  * implement using multiple measurements per select query, #10
+
+# 2.7.0
+  * support multi query
+
 # 2.6.3
   * fix grouping by time with offset, #7
 
