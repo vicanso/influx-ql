@@ -165,6 +165,21 @@ describe('influxdb-ql', () => {
     ql.where({});
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
   });
+  it('where({path: false})', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.where('path', false);
+    console.log("SELECT", ql.toSelect());
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "path" = false');
+  });
+  it('where({path: true})', () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.where({
+      path: true
+    });
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "path" = true');
+  });
 
   it('call where twice', () => {
     const ql = new QL('mydb');
