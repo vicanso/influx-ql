@@ -1,3 +1,7 @@
+# 2.9.0
+  * where condition support not nil value, such as `false`, `0` 
+  * support tz(timezone) function 
+
 # 2.8.0
   * implement using multiple measurements per select query, #10
 

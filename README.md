@@ -23,9 +23,10 @@ ql.slimit = 5;
 ql.order = 'desc';
 ql.offset = 10;
 ql.soffset = 5;
+ql.tz = 'America/Chicago';
 ql.where('code', 400);
 ql.where('"use" <= 30');
-// select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= '2016-01-01' order by time desc limit 10 slimit 5 offset 10 soffset 5
+// select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= '2016-01-01' order by time desc limit 10 slimit 5 offset 10 soffset 5 tz('America/Chicago')
 ql.toSelect();
 ```
 

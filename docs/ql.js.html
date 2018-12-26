@@ -133,8 +133,12 @@ function isRegExp(value) {
   return value.length > 2 &amp;&amp; value.charAt(0) === '/' &amp;&amp; value.charAt(value.length - 1) === '/';
 }
 
+function isReference(value) {
+  return value.length > 2 &amp;&amp; value.charAt(0) === '"' &amp;&amp; value.charAt(value.length - 1) === '"';
+}
+
 function convertConditionValue(value) {
-  if (isString(value) &amp;&amp; !isRegExp(value)) {
+  if (isString(value) &amp;&amp; !isRegExp(value) &amp;&amp; !isReference(value)) {
     return `'${value}'`;
   }
   return value;
@@ -300,6 +304,10 @@ function getQL(data) {
     arr.push(`soffset ${data.soffset}`);
   }
 
+  if (data.tz) {
+    arr.push(`tz('${data.tz}')`);
+  }
+
   return arr.join(' ');
 }
 
@@ -317,7 +325,7 @@ function showKeys(type, measurement) {
  * @example
  * const QL = require('influx-ql');
  * const ql = new QL('mydb');
- * ql.addMeasurement('http');
+ * ql.measurement = 'http';
  * ql.RP = 'two-weeks';
  * ql.addField('status', 'spdy', 'fetch time');
  * ql.start = '2016-01-01';
@@ -325,6 +333,7 @@ function showKeys(type, measurement) {
  * ql.limit = 10;
  * ql.order = 'desc';
  * ql.offset = 10;
+ * ql.tz = 'America/Chicago';
  * ql.addGroup('spdy');
  * ql.addGroup('time(30s)');
  * ql.condition('code', 400);
@@ -342,6 +351,35 @@ class QL {
     // set measurements to prevent null reference
     // measurements arent supposed to be cleared upon .clear()
     data.measurements = [];
+  }
+
+  /**
+   * Set influx ql measurement
+   * @param  {String} measurement - The measurement's name
+   * @since 2.0.0
+   * @deprecated
+   * @example
+   * const ql = new QL('mydb');
+   * ql.measurement = 'http';
+   * console.info(ql.toSelect());
+   * // => select * from "mydb".."http"
+   */
+  set measurement(measurement) {
+    internal(this).measurements = [measurement];
+  }
+
+  /**
+   * Get influx ql measurement
+   * @since 2.0.0
+   * @deprecated
+   * @example
+   * const ql = new QL('mydb');
+   * ql.measurement = 'http';
+   * console.info(ql.measurement);
+   * // => 'http'
+   */
+  get measurement() {
+    return internal(this).measurements[0];
   }
 
   /**
@@ -428,7 +466,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.RP = 'two-weeks';
    * console.info(ql.toSelect());
    * // => select * from "mydb"."two-weeks"."http"
@@ -441,7 +479,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.RP = 'two-weeks';
    * console.info(ql.RP);
    * // => two-weeks
@@ -483,19 +521,19 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.start = '-3h';
    * console.info(ql.toSelect());
    * // => select * from "mydb".."http" where time >= now() - 3h
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.start = '2015-08-18T00:00:00Z';
    * console.info(ql.toSelect());
    * // => select * from "mydb".."http" where time >= '2015-08-18T00:00:00Z'
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.start = '1388534400s;
    * console.info(ql.toSelect());
    * // => select * from "mydb".."http" where time >= 1388534400s
@@ -509,7 +547,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.start = '-3h';
    * console.info(ql.start);
    * // => '-3h';
@@ -524,7 +562,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.end = '-1h';
    * console.info(ql.toSelect());
    * // => select * from "mydb".."http" where time &lt;= now() - 1h
@@ -538,7 +576,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.end = '-1h';
    * console.info(ql.end);
    * // => '-1h';
@@ -553,7 +591,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.limit = 10;
    * console.info(ql.toSelect());
    * // => select * from "mydb".."http" limit 10
@@ -567,7 +605,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.limit = 10;
    * console.info(ql.limit);
    * // => 10
@@ -610,7 +648,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addGroup('spdy');
    * ql.fill = 0;
    * console.info(ql.toSelect());
@@ -625,7 +663,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addGroup('spdy');
    * ql.fill = 0;
    * console.info(ql.fill);
@@ -640,7 +678,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addGroup('spdy');
    * ql.order = 'desc';
    * console.info(ql.toSelect());
@@ -656,7 +694,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addGroup('spdy');
    * console.info(ql.order);
    * // => undefined
@@ -673,7 +711,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.offset = 10;
    * console.info(ql.toSelect());
    * // => select * from "mydb".."http" offset 10
@@ -687,7 +725,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * console.info(ql.offset);
    * // => 0
    * ql.offset = 10;
@@ -757,6 +795,34 @@ class QL {
     internal(this).relation = relation;
   }
 
+  /**
+   * Set influx ql time zone
+   * @param  {String} tz - time zone
+   * @since 2.9.0
+   * @example
+   * const ql = new QL('mydb');
+   * ql.tz = 'America/Chicago';
+   * console.info(ql.tz);
+   * // => America/Chicago
+   */
+  set tz(v) {
+    internal(this).tz = v;
+  }
+
+   /**
+   * Get influx ql time zone
+   * @return {String}
+   * @since 2.9.0
+   * @example
+   * const ql = new QL('mydb');
+   * ql.tz = 'America/Chicago'
+   * console.info(ql.tz);
+   * // => 'America/Chicago'
+   */
+  get tz() {
+    return internal(this).tz;
+  }
+
   // CQ BEGIN
   set cqName(v) {
     internal(this).cqName = v;
@@ -793,13 +859,13 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction('count', 'use');
    * console.info(ql.toSelect());
    * // => select count("use") from "mydb".."http"
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addMeasurement('https');
    * ql.addFunction('count', 'use');
    * console.info(ql.toSelect());
@@ -855,13 +921,13 @@ class QL {
    * @since 2.6.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addField('status', 'spdy', 'fetch time');
    * console.info(ql.toSelect());
    * // => select "fetch time","spdy","status" from "mydb".."http"
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addField({
    *   'fetch time': 'ft',
    * });
@@ -869,7 +935,7 @@ class QL {
    * // => select "fetch time" as "ft" from "mydb".."http"
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addField('"use" + 2');
    * console.info(ql.toSelect());
    * // => select "use" + 2 from "mydb".."http"
@@ -886,7 +952,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addField('status', 'spdy', 'fetch time');
    * ql.removeField('status');
    * console.info(ql.toSelect());
@@ -917,7 +983,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addField('status', 'spdy', 'fetch time');
    * ql.emptyFields();
    * console.info(ql.toSelect());
@@ -939,13 +1005,13 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL();
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.where('code', 500);
    * console.info(ql.toSelect());
    * // => select * from "http" where "code" = 500
    * @example
    * const ql = new QL();
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.where({
    *   code: 500,
    *   spdy: '1',
@@ -954,13 +1020,13 @@ class QL {
    * // => select * from "http" where ("code" = 500 and "spdy" = '1')
    * @example
    * const ql = new QL();
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.where('spdy', ['1', '2']);
    * console.info(ql.toSelect());
    * // => select * from "mydb".."http" where ("spdy" = '1' or "spdy" = '2')
    * @example
    * const ql = new QL();
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.where({
    *   code: 500,
    *   spdy: '1',
@@ -969,7 +1035,7 @@ class QL {
    * // => select * from "http" where ("code" != 500 and "spdy" != '1')
    * @example
    * const ql = new QL();
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.where('code', /5\d{2}/);
    * console.info(ql.toSelect());
    * // => select * from "http" where "code" = /5\d{2}/
@@ -979,7 +1045,7 @@ class QL {
     let args = [rlt, op];
     if (isObject(key)) {
       args = [value, rlt];
-    } else if (value) {
+    } else if (!isNil(value)) {
       data = {};
       data[key] = value;
     }
@@ -1000,7 +1066,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL();
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.condition({
    *   code: 500,
    *   spyd: '1',
@@ -1026,7 +1092,7 @@ class QL {
    * @since 2.6.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction('count', 'use');
    * ql.addFunction('mean', 'use');
    * ql.addGroup('spdy');
@@ -1034,19 +1100,19 @@ class QL {
    * // => select count("use"),mean("use") from "mydb".."http" group by "spdy"
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction("bottom", 'use', 3);
    * console.info(ql.toSelect());
    * // => select bottom("use",3) from "mydb".."http"
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction('count("use")');
    * console.info(ql.toSelect());
    * // => select count("use") from "mydb".."http"
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction('count("use")', {
    *   alias: 'countUse',
    * });
@@ -1054,7 +1120,7 @@ class QL {
    * // => select count("use") as "countUse" from "mydb".."http"
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction('count', 'use', {
    *   alias: 'countUse',
    * });
@@ -1093,7 +1159,7 @@ class QL {
    * @since 2.6.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction('count', 'use');
    * ql.addFunction('mean', 'use');
    * ql.removeFunction('count', 'use');
@@ -1128,7 +1194,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction('count', 'use');
    * ql.addFunction('mean', 'use');
    * ql.emptyFunctions();
@@ -1148,14 +1214,14 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addGroup('spdy', 'method');
    * ql.addFunction('count', 'use');
    * console.info(ql.toSelect());
    * // => select count("use") from "mydb".."http" group by "method","spdy"
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addGroup('spdy', 'time(1m)');
    * ql.addFunction('count', 'use');
    * console.info(ql.toSelect());
@@ -1174,7 +1240,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addGroup('spdy', 'method');
    * ql.removeGroup('spdy')
    * ql.addFunction('count', 'use');
@@ -1194,7 +1260,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addGroup('spdy', 'method');
    * ql.emptyGroups();
    * console.info(ql.toSelect());
@@ -1212,7 +1278,7 @@ class QL {
    * @since 2.0.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.RP = 'two-weeks';
    * ql.addField('status', 'spdy', 'fetch time');
    * ql.start = '2016-01-01';
@@ -1275,7 +1341,7 @@ class QL {
    * @since 2.5.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction('max', 'fetch time');
    * ql.addGroup('spdy');
    * ql.subQuery();
@@ -1295,7 +1361,7 @@ class QL {
    * @since 2.7.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addFunction('max', 'fetch time');
    * ql.addGroup('spdy');
    * ql.multiQuery();
@@ -1320,7 +1386,7 @@ class QL {
    * @since 2.5.0
    * @example
    * const ql = new QL('mydb');
-   * ql.addMeasurement('http');
+   * ql.measurement = 'http';
    * ql.addField('fetch time');
    * ql.addGroup('spdy');
    * ql.clean();
@@ -1463,7 +1529,7 @@ module.exports = QL;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Nov 13 2018 21:52:15 GMT+0300 (MSK) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Dec 26 2018 17:31:40 GMT+0800 (China Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

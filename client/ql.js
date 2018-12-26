@@ -274,6 +274,10 @@ function getQL(data) {
     arr.push('soffset ' + data.soffset);
   }
 
+  if (data.tz) {
+    arr.push('tz(\'' + data.tz + '\')');
+  }
+
   return arr.join(' ');
 }
 
@@ -299,6 +303,7 @@ function showKeys(type, measurement) {
  * ql.limit = 10;
  * ql.order = 'desc';
  * ql.offset = 10;
+ * ql.tz = 'America/Chicago';
  * ql.addGroup('spdy');
  * ql.addGroup('time(30s)');
  * ql.condition('code', 400);
@@ -1451,6 +1456,38 @@ var QL = function () {
     ,
     set: function set(relation) {
       internal(this).relation = relation;
+    }
+
+    /**
+     * Set influx ql time zone
+     * @param  {String} tz - time zone
+     * @since 2.9.0
+     * @example
+     * const ql = new QL('mydb');
+     * ql.tz = 'America/Chicago';
+     * console.info(ql.tz);
+     * // => America/Chicago
+     */
+
+  }, {
+    key: 'tz',
+    set: function set(v) {
+      internal(this).tz = v;
+    }
+
+    /**
+    * Get influx ql time zone
+    * @return {String}
+    * @since 2.9.0
+    * @example
+    * const ql = new QL('mydb');
+    * ql.tz = 'America/Chicago'
+    * console.info(ql.tz);
+    * // => 'America/Chicago'
+    */
+    ,
+    get: function get() {
+      return internal(this).tz;
     }
 
     // CQ BEGIN
