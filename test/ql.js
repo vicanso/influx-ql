@@ -563,9 +563,21 @@ describe('influxdb-ql', () => {
   it('clean', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
-    ql.addField('fetch time');
+    ql.RP = 'two-weeks';
+    ql.addField('status', 'spdy', 'fetch time');
+    ql.start = '2016-01-01';
+    ql.end = '-3h';
+    ql.limit = 10;
+    ql.slimit = 1;
+    ql.order = 'desc';
+    ql.offset = 20;
+    ql.soffset = 2;
+    ql.tz = 'America/Chicago';
     ql.addGroup('spdy');
-    assert.equal(ql.toSelect(), 'select "fetch time" from "mydb".."http" group by "spdy"');
+    ql.addGroup('time(30s)');
+    ql.condition('code', 400);
+    ql.condition('use', 30, '<=');
+    ql.fill = 0;
     ql.clean();
     assert.equal(ql.toSelect(), 'select * from "mydb".."http"');
   });
@@ -575,9 +587,14 @@ describe('influxdb-ql', () => {
     ql.measurement = 'http';
     ql.addFunction('max', 'fetch time');
     ql.addGroup('spdy');
+    ql.start = '2016-01-01';
+    ql.end = '-3h';
+    ql.order = 'desc';
+    ql.tz = 'America/Chicago';
     ql.subQuery();
     ql.addFunction('sum', 'max');
-    assert.equal(ql.toSelect(), 'select sum("max") from (select max("fetch time") from "mydb".."http" group by "spdy")');
+    ql.limit = 10;
+    assert.equal(ql.toSelect(), 'select sum("max") from (select max("fetch time") from "mydb".."http" where time <= now() - 3h and time >= \'2016-01-01\' group by "spdy" order by time desc tz(\'America/Chicago\')) limit 10');
   });
 
 
