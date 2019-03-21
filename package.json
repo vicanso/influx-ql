@@ -1,7 +1,7 @@
 {
   "name": "influx-ql",
   "description": "Simple way for influx ql",
-  "version": "2.9.0",
+  "version": "2.9.1",
   "author": "Tree Xie <vicansocanbico@gmail.com>",
   "keywords": [
     "influxdb",

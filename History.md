@@ -1,3 +1,6 @@
+# 2.9.1
+	* fix clean function not clean all fields, #14
+
 # 2.9.0
   * where condition support not nil value, such as `false`, `0` 
   * support tz(timezone) function 
