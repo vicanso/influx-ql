@@ -948,6 +948,15 @@ var QL = function () {
       data.rp = '';
       data.intoRP = '';
       data.subQuery = '';
+      data.start = '';
+      data.end = '';
+      data.limit = 0;
+      data.slimit = 0;
+      data.offset = 0;
+      data.soffset = 0;
+      data.tz = '';
+      data.order = '';
+      data.fill = null;
     }
   }, {
     key: 'toCQ',
@@ -1117,7 +1126,7 @@ var QL = function () {
      * @since 2.0.0
      * @example
      * const ql = new QL('mydb');
-     * ql.mearsurement = 'http';
+     * ql.measurement = 'http';
      * ql.rp = 'my-rp';
      * ql.intoDatabase = 'mydb copy';
      * ql.into = 'http copy';
