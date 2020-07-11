@@ -43,14 +43,14 @@ describe('influxdb-ql', () => {
     ql.where('code', 400);
     ql.where('"use" <= 30');
     ql.fill = 0;
-    assert.equal(ql.toSelect(), `select "fetch time","spdy","status" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time <= now() - 3h and time >= '2018-01-27T05:38:56.145Z' group by "spdy" fill(0) order by time desc limit 10 slimit 5 offset 10 soffset 5 tz('America/Chicago')`);
+    assert.equal(ql.toSelect(), `select "status","spdy","fetch time" from "mydb"."default"."http" where "code" = 400 and "use" <= 30 and time >= '2018-01-27T05:38:56.145Z' and time <= now() - 3h group by "spdy" fill(0) order by time desc limit 10 slimit 5 offset 10 soffset 5 tz('America/Chicago')`);
   });
 
   it('addField', () => {
     const ql = new QL('mydb');
     ql.measurement = 'http';
     ql.addField('status', 'spdy', 'fetch time');
-    assert.equal(ql.toSelect(), 'select "fetch time","spdy","status" from "mydb".."http"');
+    assert.equal(ql.toSelect(), 'select "status","spdy","fetch time" from "mydb".."http"');
   });
 
   it('addField use alias', () => {
@@ -151,7 +151,7 @@ describe('influxdb-ql', () => {
     ql.measurement = 'http';
     ql.where({spdy: '/1|2/'});
     ql.where({method: /GET/});
-    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = /GET/ and "spdy" = /1|2/');
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "spdy" = /1|2/ and "method" = /GET/');
   });
 
   it('where({path: "/"}', () => {
@@ -194,10 +194,10 @@ describe('influxdb-ql', () => {
     ql.measurement = 'http';
     ql.where('spdy', '1');
     ql.where('method', 'GET');
-    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = \'GET\' and "spdy" = \'1\'');
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "spdy" = \'1\' and "method" = \'GET\'');
 
     ql.relation = 'or';
-    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "method" = \'GET\' or "spdy" = \'1\'');
+    assert.equal(ql.toSelect(), 'select * from "mydb".."http" where "spdy" = \'1\' or "method" = \'GET\'');
   });
 
   it('emptyConditions', () => {
@@ -274,7 +274,7 @@ describe('influxdb-ql', () => {
     ql.measurement = 'http';
     ql.addFunction('bottom("use",3)');
     ql.addField('spdy');
-    assert.equal(ql.toSelect(), 'select "spdy",bottom("use",3) from "mydb".."http"');
+    assert.equal(ql.toSelect(), 'select bottom("use",3),"spdy" from "mydb".."http"');
   });
 
   it('addFunction and use alias', () => {
@@ -284,7 +284,7 @@ describe('influxdb-ql', () => {
       alias: 'bot3Use',
     });
     ql.addField('spdy');
-    assert.equal(ql.toSelect(), 'select "spdy",bottom("use",3) as "bot3Use" from "mydb".."http"');
+    assert.equal(ql.toSelect(), 'select bottom("use",3) as "bot3Use","spdy" from "mydb".."http"');
 
     ql = new QL('mydb');
     ql.measurement = 'http';
@@ -292,7 +292,7 @@ describe('influxdb-ql', () => {
       alias: 'bot3Use',
     });
     ql.addField('spdy');
-    assert.equal(ql.toSelect(), 'select "spdy",bottom("use",3) as "bot3Use" from "mydb".."http"');
+    assert.equal(ql.toSelect(), 'select bottom("use",3) as "bot3Use","spdy" from "mydb".."http"');
   });
 
   it('removeFunction', () => {
@@ -332,7 +332,7 @@ describe('influxdb-ql', () => {
     ql.measurement = 'http';
     ql.addGroup('spdy', 'method');
     ql.addFunction('count', 'use');
-    assert.equal(ql.toSelect(), 'select count("use") from "mydb".."http" group by "method","spdy"');
+    assert.equal(ql.toSelect(), 'select count("use") from "mydb".."http" group by "spdy","method"');
   });
 
   it('removeGroup', () => {
@@ -383,7 +383,7 @@ describe('influxdb-ql', () => {
     const ql = new QL();
     ql.measurement = 'http';
     ql.addField('status', 'code');
-    assert.equal(ql.toSelect(), 'select "code","status" from "http"');
+    assert.equal(ql.toSelect(), 'select "status","code" from "http"');
 
     ql.removeField('status', 'code');
     assert.equal(ql.toSelect(), 'select * from "http"');
@@ -395,15 +395,15 @@ describe('influxdb-ql', () => {
 
     ql.start = '2016-03-01 23:32:01.232';
     ql.end = '2016-03-02';
-    assert.equal(ql.toSelect(), 'select * from "http" where time <= \'2016-03-02\' and time >= \'2016-03-01 23:32:01.232\'');
+    assert.equal(ql.toSelect(), 'select * from "http" where time >= \'2016-03-01 23:32:01.232\' and time <= \'2016-03-02\'');
 
     // 3 hours ago
     ql.end = '-3h';
-    assert.equal(ql.toSelect(), 'select * from "http" where time <= now() - 3h and time >= \'2016-03-01 23:32:01.232\'');
+    assert.equal(ql.toSelect(), 'select * from "http" where time >= \'2016-03-01 23:32:01.232\' and time <= now() - 3h');
 
     // Absolute time
     ql.end = '1388534400s';
-    assert.equal(ql.toSelect(), 'select * from "http" where time <= 1388534400s and time >= \'2016-03-01 23:32:01.232\'');
+    assert.equal(ql.toSelect(), 'select * from "http" where time >= \'2016-03-01 23:32:01.232\' and time <= 1388534400s');
   });
 
   it('set limit', () => {
@@ -440,7 +440,7 @@ describe('influxdb-ql', () => {
 
     ql.where('code', 404);
     ql.relation = 'or';
-    assert.equal(ql.toSelect(), 'select * from "http" where "code" = 404 or ("code" = 500 and "spdy" = \'1\')');
+    assert.equal(ql.toSelect(), 'select * from "http" where ("code" = 500 and "spdy" = \'1\') or "code" = 404');
 
     ql.emptyConditions();
     ql.where('spdy', 'slow');
@@ -470,7 +470,7 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select mean("use") from "http"');
 
     ql.addFunction('count', 'use');
-    assert.equal(ql.toSelect(), 'select count("use"),mean("use") from "http"');
+    assert.equal(ql.toSelect(), 'select mean("use"),count("use") from "http"');
 
     ql.removeFunction('count', 'use');
     assert.equal(ql.toSelect(), 'select mean("use") from "http"');
@@ -496,7 +496,7 @@ describe('influxdb-ql', () => {
     assert.equal(ql.toSelect(), 'select mean("use") from "http" group by "ajax status"');
 
     ql.addGroup('time(6h, 10m)', 'spdy')
-    assert.equal(ql.toSelect(), 'select mean("use") from "http" group by "ajax status","spdy",time(6h, 10m)');
+    assert.equal(ql.toSelect(), 'select mean("use") from "http" group by "ajax status",time(6h, 10m),"spdy"');
   });
 
   it('fill', () => {
@@ -522,7 +522,7 @@ describe('influxdb-ql', () => {
     ql.end = '2015-08-18T00:30:00Z';
     ql.addGroup('time(10m)');
 
-    assert.equal(ql.toSelect(), 'select mean("use") into "http copy" from "http" where "spdy" = \'slow\' and time <= \'2015-08-18T00:30:00Z\' and time >= \'2015-08-18T00:00:00Z\' group by time(10m)');
+    assert.equal(ql.toSelect(), 'select mean("use") into "http copy" from "http" where "spdy" = \'slow\' and time >= \'2015-08-18T00:00:00Z\' and time <= \'2015-08-18T00:30:00Z\' group by time(10m)');
 
   });
 
@@ -594,7 +594,7 @@ describe('influxdb-ql', () => {
     ql.subQuery();
     ql.addFunction('sum', 'max');
     ql.limit = 10;
-    assert.equal(ql.toSelect(), 'select sum("max") from (select max("fetch time") from "mydb".."http" where time <= now() - 3h and time >= \'2016-01-01\' group by "spdy" order by time desc tz(\'America/Chicago\')) limit 10');
+    assert.equal(ql.toSelect(), 'select sum("max") from (select max("fetch time") from "mydb".."http" where time >= \'2016-01-01\' and time <= now() - 3h group by "spdy" order by time desc tz(\'America/Chicago\')) limit 10');
   });
 
 
