@@ -52,6 +52,13 @@ describe('influxdb-ql', () => {
     ql.addField('status', 'spdy', 'fetch time');
     assert.equal(ql.toSelect(), 'select "status","spdy","fetch time" from "mydb".."http"');
   });
+  it("addField(+, -)", () => {
+    const ql = new QL('mydb');
+    ql.measurement = 'http';
+    ql.addField('"use" - 2');
+    ql.addField('"use" + 2');
+    assert.equal(ql.toSelect(), 'select "use" - 2,"use" + 2 from "mydb".."http"'); 
+  })
 
   it('addField use alias', () => {
     const ql = new QL('mydb');
